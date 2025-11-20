@@ -162,13 +162,11 @@ zipher-campus/
 │   └── hardhat.config.js
 │
 ├── relayer/         # Coprocessor + KMS handler
-│   ├── server.js
-│   ├── kms.js
-│   ├── coprocessor.js
-│   └── api.js
-│
-└── demo/
-    └── DEMO_VIDEO_SCRIPT.md
+    ├── server.js
+    ├── kms.js
+    ├── coprocessor.js
+    └── api.js
+
 
 ---
 
