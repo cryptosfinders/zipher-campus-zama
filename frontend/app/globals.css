@@ -1,6 +1,90 @@
-@tailwind base; @tailwind components; @tailwind utilities;
-:root { --zama-yellow: #FFD400; --zama-cream: #FFF4CC; --zama-yellow-dark: #FFB900; }
-html,body,#__next{height:100%}
-body{ background: linear-gradient(180deg,var(--zama-cream),var(--zama-yellow)); font-family: Inter, system-ui, -apple-system; padding:20px;}
-.card{ background:white; border:6px solid var(--zama-yellow-dark); border-radius:12px; padding:18px; box-shadow:0 12px 30px rgba(0,0,0,0.08);}
-.btn{ background:var(--zama-yellow-dark); color:#000; padding:8px 14px; border-radius:8px; font-weight:700;}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+html,
+body {
+  height: 100%;
+}
+
+@layer base {
+  :root {
+  --color-zipher: #d4af37; /* GOLD ZIPHER COLOR */
+
+  --border: 214 20% 85%;
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+
+  --primary: var(--color-zipher);
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 8% 46%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 224 71% 4%;
+  --foreground: 213 31% 91%;
+
+  --border: 216 34% 17%;
+  --primary: var(--color-zipher);
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 222 47% 11%;
+  --secondary-foreground: 213 31% 91%;
+
+  --muted: 222 47% 11%;
+  --muted-foreground: 217 33% 57%;
+
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+}
+
+  /* -----------------------------
+     UNIVERSAL WALLET OVERRIDES
+     (Adapted to Gold Theme)
+  ------------------------------*/
+  .default-light,
+  .default-dark {
+    --ock-font-family: var(--font-sans, 'Inter', sans-serif);
+    --ock-border-radius: var(--radius);
+    --ock-border-radius-inner: calc(var(--radius) - 4px);
+
+    --ock-bg-primary: hsl(var(--primary));
+    --ock-bg-primary-hover: hsl(var(--primary) / 0.9);
+    --ock-bg-primary-active: hsl(var(--primary) / 0.85);
+    --ock-bg-primary-washed: hsl(var(--primary) / 0.2);
+    --ock-bg-primary-disabled: hsl(var(--primary) / 0.4);
+
+    --ock-text-inverse: hsl(var(--primary-foreground));
+    --ock-text-primary: hsl(var(--foreground));
+    --ock-text-foreground: hsl(var(--foreground));
+    --ock-text-foreground-muted: hsl(var(--muted-foreground));
+
+    --ock-icon-color-inverse: hsl(var(--primary-foreground));
+    --ock-icon-color-primary: hsl(var(--primary));
+    --ock-icon-color-foreground: hsl(var(--foreground));
+
+    --ock-border-line-primary: hsl(var(--primary));
+    --ock-border-line-default: hsl(var(--border));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

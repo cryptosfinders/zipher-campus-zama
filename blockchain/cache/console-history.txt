@@ -1,0 +1,2 @@
+await reg.setMarketplace("0xe7f1725e7734ce288f8367e1bb143e90bb3f0512")
+const reg = await ethers.getContractAt("Registrar", "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9")

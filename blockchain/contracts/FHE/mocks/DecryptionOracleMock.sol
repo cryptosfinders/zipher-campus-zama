@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+pragma solidity ^0.8.24;
+
+contract DecryptionOracleMock {
+    function requestDecryption(bytes32[] memory)
+        external
+        pure
+        returns (uint256)
+    {
+        return 1;
+    }
+}

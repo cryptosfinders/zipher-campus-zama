@@ -1,0 +1,62 @@
+// SPDX-License-Identifier: BSD-3-Clause-Clear
+pragma solidity ^0.8.24;
+
+import { FHE, euint32, externalEuint32 } from "@fhevm/solidity/lib/FHE.sol";
+import { CoprocessorConfig } from "@fhevm/solidity/lib/Impl.sol";
+
+contract FHECampusReputation {
+    struct User {
+        euint32 xp;
+        euint32 level;
+    }
+
+    mapping(address => User) private users;
+
+    event ReputationUpdated(address indexed user);
+
+    /// constructor: accepts addresses for ACL, Coprocessor, KMS verifier
+    /// Note: CoprocessorConfig expects 4 addresses in this package version.
+    constructor(
+        address aclAddress,
+        address coprocessorAddress,
+        address kmsVerifierAddress
+    ) {
+        // Provide 4 addresses (fourth is zero when not used in your setup)
+        CoprocessorConfig memory cfg = CoprocessorConfig(
+            aclAddress,
+            coprocessorAddress,
+            kmsVerifierAddress,
+            address(0)
+        );
+
+        // Configure the FHE library to use our deployed coprocessor & acl
+        FHE.setCoprocessor(cfg);
+    }
+
+    function addXP(externalEuint32 encryptedValue, bytes calldata inputProof) external {
+        euint32 v = FHE.fromExternal(encryptedValue, inputProof);
+
+        if (!FHE.isInitialized(users[msg.sender].xp)) {
+            users[msg.sender].xp = FHE.asEuint32(0);
+            users[msg.sender].level = FHE.asEuint32(0);
+        }
+
+        users[msg.sender].xp = FHE.add(users[msg.sender].xp, v);
+        users[msg.sender].level = FHE.div(users[msg.sender].xp, uint32(100));
+
+        FHE.allow(users[msg.sender].xp, msg.sender);
+        FHE.allow(users[msg.sender].level, msg.sender);
+        FHE.allowThis(users[msg.sender].xp);
+        FHE.allowThis(users[msg.sender].level);
+
+        emit ReputationUpdated(msg.sender);
+    }
+
+    function getEncryptedXP() external view returns (euint32) {
+        return users[msg.sender].xp;
+    }
+
+    function getEncryptedLevel() external view returns (euint32) {
+        return users[msg.sender].level;
+    }
+}

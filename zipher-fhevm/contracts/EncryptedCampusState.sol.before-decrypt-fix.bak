@@ -1,0 +1,221 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.27;
+
+/*
+ *  FULL FHE CAMPUS STATE LAYER
+ *  Modern FHE API (2025) using FHE.sol
+ *
+ *  ✓ Encrypted Membership
+ *  ✓ Encrypted Reputation
+ *  ✓ Encrypted Voting
+ *  ✓ Encrypted Analytics
+ *  ✓ Admin-only decrypt endpoints
+ *
+ */
+
+import "./fhevm-solidity/lib/FHE.sol";
+
+contract EncryptedCampusState {
+
+    /* ---------------------------------------------------------------------- */
+    /*                                ACCESS                                  */
+    /* ---------------------------------------------------------------------- */
+
+    address public admin;
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can decrypt");
+        _;
+    }
+
+    constructor() {
+        admin = msg.sender;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /*                        1️⃣ ENCRYPTED MEMBERSHIP                         */
+    /* ---------------------------------------------------------------------- */
+
+    // groupId => user => encrypted active flag (bool)
+    mapping(bytes32 => mapping(address => ebool)) private membership;
+
+    function setMembership(
+        bytes32 groupId,
+        address user,
+        bool isActive
+    ) external onlyAdmin {
+        // ✅ new API: asEbool
+        membership[groupId][user] = FHE.asEbool(isActive);
+    }
+
+    /// ADMIN decrypt membership status
+    function getMembershipDecrypted(
+        bytes32 groupId,
+        address user
+    ) external view onlyAdmin returns (bool) {
+        ebool enc = membership[groupId][user];
+        return FHE.decrypt(enc);
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /*                        2️⃣ ENCRYPTED REPUTATION                         */
+    /* ---------------------------------------------------------------------- */
+
+    // groupId => user => encrypted reputation uint64
+    mapping(bytes32 => mapping(address => euint64)) private reputation;
+
+    function initReputation(
+        bytes32 groupId,
+        address user,
+        uint64 initialValue
+    ) external onlyAdmin {
+        // only set if not initialized
+        if (!FHE.isInitialized(reputation[groupId][user])) {
+            // ✅ new API: asEuint64
+            reputation[groupId][user] = FHE.asEuint64(initialValue);
+        }
+    }
+
+    function addReputation(
+        bytes32 groupId,
+        address user,
+        uint64 delta
+    ) external onlyAdmin {
+        euint64 current = reputation[groupId][user];
+
+        if (!FHE.isInitialized(current)) {
+            current = FHE.asEuint64(0);
+        }
+
+        reputation[groupId][user] =
+            FHE.add(current, FHE.asEuint64(delta));
+    }
+
+    /// ADMIN decrypt reputation
+    function getReputationDecrypted(
+        bytes32 groupId,
+        address user
+    ) external view onlyAdmin returns (uint64) {
+        euint64 enc = reputation[groupId][user];
+        if (!FHE.isInitialized(enc)) return 0;
+        return FHE.decrypt(enc);
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /*                        3️⃣ ENCRYPTED VOTING                             */
+    /* ---------------------------------------------------------------------- */
+
+    struct PollConfig {
+        uint8 maxOption;   // e.g. 3 => options 0,1,2,3
+        bool isSealed;
+        bool exists;
+    }
+
+    mapping(bytes32 => PollConfig) public polls;
+
+    // pollId => user => encrypted option
+    // ✅ use euint8, not FHE.uint8
+    mapping(bytes32 => mapping(address => euint8)) private votes;
+
+    // pollId => option => encrypted tally
+    mapping(bytes32 => mapping(uint8 => euint64)) private tallies;
+
+    function createPoll(bytes32 pollId, uint8 maxOption) external onlyAdmin {
+        require(maxOption > 0, "maxOption must be > 0");
+
+        PollConfig storage p = polls[pollId];
+        require(!p.exists, "Poll exists");
+
+        p.maxOption = maxOption;
+        p.isSealed = false;
+        p.exists = true;
+
+        for (uint8 i = 0; i <= maxOption; i++) {
+            tallies[pollId][i] = FHE.asEuint64(0);
+        }
+    }
+
+    function castVote(
+        bytes32 pollId,
+        address user,
+        uint8 option
+    ) external onlyAdmin {
+
+        PollConfig memory p = polls[pollId];
+        require(p.exists, "Poll missing");
+        require(!p.isSealed, "Poll sealed");
+        require(option <= p.maxOption, "Invalid option");
+
+        // Remove previous encrypted vote
+        euint8 prevVote = votes[pollId][user];
+        if (FHE.isInitialized(prevVote)) {
+            for (uint8 i = 0; i <= p.maxOption; i++) {
+                // ✅ asEuint8 + asEuint64
+                ebool matchPrev = FHE.eq(prevVote, FHE.asEuint8(i));
+                euint64 delta = FHE.cmux(
+                    matchPrev,
+                    FHE.asEuint64(1),
+                    FHE.asEuint64(0)
+                );
+                tallies[pollId][i] = FHE.sub(tallies[pollId][i], delta);
+            }
+        }
+
+        // Add new vote
+        votes[pollId][user] = FHE.asEuint8(option);
+        tallies[pollId][option] =
+            FHE.add(tallies[pollId][option], FHE.asEuint64(1));
+    }
+
+    function sealPoll(bytes32 pollId) external onlyAdmin {
+        require(polls[pollId].exists, "Poll missing");
+        polls[pollId].isSealed = true;
+    }
+
+    /// ADMIN decrypt final tally array
+    function getPollResultsDecrypted(
+        bytes32 pollId
+    ) external view onlyAdmin returns (uint64[] memory) {
+
+        PollConfig memory p = polls[pollId];
+        require(p.exists, "Poll missing");
+        require(p.isSealed, "Poll not sealed");
+
+        uint8 maxOpt = p.maxOption;
+        uint64[] memory results = new uint64[](maxOpt + 1);
+
+        for (uint8 i = 0; i <= maxOpt; i++) {
+            results[i] = FHE.decrypt(tallies[pollId][i]);
+        }
+
+        return results;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /*                        4️⃣ ENCRYPTED ANALYTICS                          */
+    /* ---------------------------------------------------------------------- */
+
+    // metricId => encrypted counter
+    mapping(bytes32 => euint64) private analytics;
+
+    function incrementMetric(bytes32 metricId, uint64 delta) external {
+        euint64 current = analytics[metricId];
+
+        if (!FHE.isInitialized(current)) {
+            current = FHE.asEuint64(0);
+        }
+
+        analytics[metricId] =
+            FHE.add(current, FHE.asEuint64(delta));
+    }
+
+    function getMetricDecrypted(
+        bytes32 metricId
+    ) external view onlyAdmin returns (uint64) {
+
+        euint64 val = analytics[metricId];
+        if (!FHE.isInitialized(val)) return 0;
+
+        return FHE.decrypt(val);
+    }
+}

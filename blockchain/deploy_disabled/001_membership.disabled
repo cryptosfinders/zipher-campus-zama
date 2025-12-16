@@ -1,0 +1,21 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const { deployer } = await hre.getNamedAccounts();
+  const { deploy, log } = hre.deployments;
+
+  // Recommended default Zipher Campus metadata URI
+  const baseURI = "ipfs://zipher-campus-metadata/";
+
+  const result = await deploy("MembershipPass1155", {
+    from: deployer,
+    args: [baseURI, deployer], // (string uri, address admin)
+    log: true,
+  });
+
+  log(`MembershipPass1155 deployed at: ${result.address}`);
+};
+
+export default func;
+func.tags = ["Membership"];

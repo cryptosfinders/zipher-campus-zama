@@ -1,0 +1,46 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const { deployments, getNamedAccounts, ethers } = hre;
+  const { deploy, log } = deployments;
+
+  const { deployer } = await getNamedAccounts();
+
+  log("----------------------------------------------------");
+  log("Deploying MembershipMarketplace...");
+  const marketplace = await deploy("MembershipMarketplace", {
+    from: deployer,
+    args: [],
+    log: true,
+  });
+
+  log("Deploying Registrar...");
+  const registrar = await deploy("Registrar", {
+    from: deployer,
+    args: [],
+    log: true,
+  });
+
+  const registrarContract = await ethers.getContractAt(
+    "Registrar",
+    registrar.address
+  );
+  const marketplaceContract = await ethers.getContractAt(
+    "MembershipMarketplace",
+    marketplace.address
+  );
+
+  log("Linking Registrar <-> MembershipMarketplace...");
+  const tx1 = await registrarContract.setMarketplace(marketplace.address);
+  await tx1.wait();
+
+  const tx2 = await marketplaceContract.setRegistrar(registrar.address);
+  await tx2.wait();
+
+  log("Registrar deployed at:            ", registrar.address);
+  log("MembershipMarketplace deployed at:", marketplace.address);
+};
+
+export default func;
+func.tags = ["Registrar", "MembershipMarketplace"];

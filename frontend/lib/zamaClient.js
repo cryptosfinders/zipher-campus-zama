@@ -1,41 +1,34 @@
-import { ethers } from 'ethers';
-import axios from 'axios';
+import { registerCourse } from "./relayerClient";
 
-/*
-  Zama WASM integration template.
-  Replace the placeholder import and APIs with the real Zama Concrete / fhEVM SDK once available.
-  The code below attempts to dynamically import '@zama/concrete-wasm' and falls back to a safe local mock.
-*/
-
-let ZAMA = null;
-export async function loadZamaClient(){
-  if(ZAMA) return ZAMA;
-  try{
-    ZAMA = await import('@zama/concrete-wasm'); // TODO: replace with actual package name
-    return ZAMA;
-  }catch(e){
-    console.warn('Zama WASM client not available, falling back to mock encryption. Replace with real SDK for production.');
-    ZAMA = null;
-    return null;
-  }
+// Mock encryption fallback until we plug real Zama WASM
+function mockEncrypt(plaintext) {
+  return `enc(${btoa(plaintext)})`;
 }
 
-export async function encryptAndSubmitCourse(metadata){
-  // metadata is a JSON object; we encrypt locally and submit ciphertext to relayer or contract
-  const wasm = await loadZamaClient();
-  let ciphertextHex;
-  if(wasm && wasm.ConcreteClient){
-    const client = await wasm.ConcreteClient.create();
-    const pk = await client.fetchGlobalPublicKey(); // placeholder API
-    const ct = await client.encryptJSON(pk, metadata);
-    ciphertextHex = ethers.hexlify(ct);
-  }else{
-    // Mock encryption: base64 -> hex (for demo only)
-    const s = JSON.stringify(metadata);
-    const b64 = Buffer.from(s).toString('base64');
-    ciphertextHex = Buffer.from(b64).toString('hex');
+function mockDecrypt(ciphertext) {
+  if (ciphertext.startsWith("enc(") && ciphertext.endsWith(")")) {
+    return atob(ciphertext.slice(4, -1));
   }
-  // Submit to relayer which will post to chain or store as demo
-  const resp = await axios.post((process.env.NEXT_PUBLIC_RELAYER_URL||'http://localhost:4002')+'/api/register-course', { ciphertext: ciphertextHex });
-  return resp.data;
+  return "Invalid ciphertext";
+}
+
+export async function encrypt(plaintext) {
+  // In future:
+  // const ZAMA = await import("@zama/fhe-sdk")
+  // return ZAMA.encrypt(plaintext)
+
+  return mockEncrypt(plaintext);
+}
+
+export async function decrypt(ciphertext) {
+  return mockDecrypt(ciphertext);
+}
+
+/**
+ * 🔥 High-level helper = encrypt + submit to relayer
+ */
+export async function encryptAndSubmitCourse(plaintext) {
+  const ciphertext = await encrypt(plaintext);
+  const result = await registerCourse(ciphertext);
+  return { ciphertext, result };
 }

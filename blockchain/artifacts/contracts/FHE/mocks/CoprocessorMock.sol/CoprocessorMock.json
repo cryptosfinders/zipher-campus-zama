@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "CoprocessorMock",
+  "sourceName": "contracts/FHE/mocks/CoprocessorMock.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes1",
+          "name": "",
+          "type": "bytes1"
+        }
+      ],
+      "name": "fheOp",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b5060cd80601d6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063e073543414602d575b600080fd5b604160383660046053565b60019392505050565b60405190815260200160405180910390f35b600080600060608486031215606757600080fd5b833592506020840135915060408401356001600160f81b031981168114608c57600080fd5b80915050925092509256fea264697066735822122034a59d73414b1bab25fd114e0aa178ebc4b77c2d4ea9019baee0cfad1befffcb64736f6c63430008190033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c8063e073543414602d575b600080fd5b604160383660046053565b60019392505050565b60405190815260200160405180910390f35b600080600060608486031215606757600080fd5b833592506020840135915060408401356001600160f81b031981168114608c57600080fd5b80915050925092509256fea264697066735822122034a59d73414b1bab25fd114e0aa178ebc4b77c2d4ea9019baee0cfad1befffcb64736f6c63430008190033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

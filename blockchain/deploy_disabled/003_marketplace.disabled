@@ -1,0 +1,32 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const { deployer } = await hre.getNamedAccounts();
+  const { deploy, log, get } = hre.deployments;
+
+  const membership = await get("MembershipPass1155");
+
+  // CONFIGURE MARKETPLACE
+  const admin = deployer;
+  const treasury = deployer;
+  const feeBps = 500; // 5%
+  const listingDuration = 30 * 24 * 60 * 60; // 30 days
+
+  const marketplace = await deploy("MembershipMarketplace", {
+    from: deployer,
+    args: [
+      membership.address, // MembershipPass1155
+      admin,              // admin (DEFAULT_ADMIN_ROLE)
+      treasury,           // treasury (fee destination)
+      feeBps,             // platform fee (max 10%)
+      listingDuration     // listing duration seconds
+    ],
+    log: true,
+  });
+
+  log(`MembershipMarketplace deployed at: ${marketplace.address}`);
+};
+
+export default func;
+func.tags = ["Marketplace"];

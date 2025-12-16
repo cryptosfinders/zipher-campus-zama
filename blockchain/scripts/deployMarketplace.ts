@@ -1,0 +1,80 @@
+import hre from "hardhat";
+
+import {
+  adminAddress,
+  existingMembershipAddress,
+  existingRegistrarAddress,
+  marketplaceFeeBps,
+  marketplaceMaxListingDuration,
+  marketplaceTreasuryAddress
+} from "./config.ts";
+import { updateEnvLog } from "./utils/logEnv.ts";
+import { shouldVerifyNetwork } from "./utils/verify.ts";
+
+async function main() {
+  const { ethers, network } = hre;
+
+  if (!existingMembershipAddress) {
+    throw new Error(
+      "Membership contract address not found. Populate MEMBERSHIP_CONTRACT_ADDRESS in blockchain/.env (deploy the pass first) before running this script."
+    );
+  }
+
+  console.log(`\n🚀 Deploying MembershipMarketplace to '${network.name}'…`);
+  console.log(`   · admin:      ${adminAddress}`);
+  console.log(`   · membership: ${existingMembershipAddress}`);
+  console.log(`   · treasury:   ${marketplaceTreasuryAddress}`);
+  console.log(`   · fee bps:    ${marketplaceFeeBps}`);
+  console.log(`   · max list:   ${marketplaceMaxListingDuration} seconds`);
+
+  const factory = await ethers.getContractFactory("MembershipMarketplace");
+  const contract = await factory.deploy(
+    existingMembershipAddress,
+    adminAddress,
+    marketplaceTreasuryAddress,
+    marketplaceFeeBps,
+    marketplaceMaxListingDuration
+  );
+  await contract.waitForDeployment();
+
+  const address = await contract.getAddress();
+  console.log(`✅ MembershipMarketplace deployed at ${address}`);
+
+  updateEnvLog("MARKETPLACE_CONTRACT_ADDRESS", address);
+
+  const membership = await ethers.getContractAt("MembershipPass1155", existingMembershipAddress);
+  const marketplaceRole = await membership.MARKETPLACE_ROLE();
+  const tx = await membership.grantRole(marketplaceRole, address);
+  await tx.wait();
+  console.log("🔑 MARKETPLACE_ROLE granted on MembershipPass1155");
+
+  if (existingRegistrarAddress) {
+    const registrar = await ethers.getContractAt("Registrar", existingRegistrarAddress);
+    const setTx = await registrar.setMarketplace(address);
+    await setTx.wait();
+    console.log("🔧 Registrar marketplace set");
+  }
+
+  if (shouldVerifyNetwork(network.name)) {
+    try {
+      await hre.run("verify:verify", {
+        address,
+        constructorArguments: [
+          existingMembershipAddress,
+          adminAddress,
+          marketplaceTreasuryAddress,
+          marketplaceFeeBps,
+          marketplaceMaxListingDuration
+        ]
+      });
+      console.log("🔍 Verification submitted to Push Scan");
+    } catch (err) {
+      console.warn("⚠️ Verification failed:", err instanceof Error ? err.message : err);
+    }
+  }
+}
+
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -1,0 +1,152 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/// @notice Adjust this import to match whatever FHE lib you already use in FHECounter.
+/// Common patterns are:
+/// import "@fhevm/solidity-contracts/contracts/FHE.sol";
+import "@fhevm/solidity-contracts/contracts/FHE.sol";
+
+import "./Registrar.sol";
+
+/**
+ * @title FHEReputation
+ * @notice Per-course + global encrypted reputation for campus members.
+ *
+ * - Reputation is stored as encrypted integers (euint32).
+ * - Only a trusted updater (backend relayer / owner) can change scores.
+ * - Anyone can read the ciphertext and decrypt client-side with FHE keys.
+ */
+contract FHEReputation {
+    using FHE for euint32;
+
+    /// -----------------------------------------------------------------------
+    /// Storage
+    /// -----------------------------------------------------------------------
+
+    Registrar public immutable registrar;
+
+    /// @notice Owner (deployer) – can manage updaters.
+    address public owner;
+
+    /// @notice Optional backend / relayer authorized to update reputation.
+    address public updater;
+
+    /// @dev Encrypted reputation per (courseId, user).
+    mapping(uint256 => mapping(address => euint32)) private _courseRep;
+
+    /// @dev Encrypted global reputation per user (across courses).
+    mapping(address => euint32) private _globalRep;
+
+    event UpdaterChanged(address indexed newUpdater);
+    event CourseReputationUpdated(
+        uint256 indexed courseId,
+        address indexed user
+    );
+    event GlobalReputationUpdated(address indexed user);
+
+    error NotAuthorized();
+    error InvalidCourse();
+    error ZeroAddress();
+
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert NotAuthorized();
+        _;
+    }
+
+    modifier onlyUpdater() {
+        if (msg.sender != owner && msg.sender != updater) revert NotAuthorized();
+        _;
+    }
+
+    constructor(address _registrar, address _updater) {
+        if (_registrar == address(0)) revert ZeroAddress();
+        registrar = Registrar(_registrar);
+        owner = msg.sender;
+        updater = _updater;
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Admin
+    /// -----------------------------------------------------------------------
+
+    function setUpdater(address _updater) external onlyOwner {
+        if (_updater == address(0)) revert ZeroAddress();
+        updater = _updater;
+        emit UpdaterChanged(_updater);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Reputation updates (encrypted)
+    /// -----------------------------------------------------------------------
+    /// Patterns:
+    /// - `encDelta` is an encrypted uint32 generated client-side.
+    /// - We FHE.add it to existing encrypted score.
+    /// - All access control / business logic lives in the relayer or off-chain.
+
+    /**
+     * @notice Increase a user's reputation for a given course.
+     * @param courseId ID from Registrar.
+     * @param user wallet whose reputation is updated.
+     * @param encDelta encrypted delta (e.g. +1, +10, etc).
+     */
+    function increaseCourseReputation(
+        uint256 courseId,
+        address user,
+        bytes calldata encDelta
+    ) external onlyUpdater {
+        // Require the course to exist in Registrar
+        bool exists = registrar.courseExists(courseId);
+        if (!exists) revert InvalidCourse();
+
+        euint32 delta = FHE.asEuint32(encDelta);
+        euint32 currentCourse = _courseRep[courseId][user];
+        euint32 currentGlobal = _globalRep[user];
+
+        _courseRep[courseId][user] = FHE.add(currentCourse, delta);
+        _globalRep[user] = FHE.add(currentGlobal, delta);
+
+        emit CourseReputationUpdated(courseId, user);
+        emit GlobalReputationUpdated(user);
+    }
+
+    /**
+     * @notice Set reputation explicitly (e.g. migration / admin fix).
+     * @dev Keep this for now; you can remove later if you want only deltas.
+     */
+    function setCourseReputation(
+        uint256 courseId,
+        address user,
+        bytes calldata encValue
+    ) external onlyUpdater {
+        bool exists = registrar.courseExists(courseId);
+        if (!exists) revert InvalidCourse();
+
+        _courseRep[courseId][user] = FHE.asEuint32(encValue);
+        emit CourseReputationUpdated(courseId, user);
+    }
+
+    function setGlobalReputation(
+        address user,
+        bytes calldata encValue
+    ) external onlyUpdater {
+        _globalRep[user] = FHE.asEuint32(encValue);
+        emit GlobalReputationUpdated(user);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Views – return ciphertext to be decrypted client-side
+    /// -----------------------------------------------------------------------
+
+    function getCourseReputationCipher(
+        uint256 courseId,
+        address user
+    ) external view returns (euint32) {
+        return _courseRep[courseId][user];
+    }
+
+    function getGlobalReputationCipher(
+        address user
+    ) external view returns (euint32) {
+        return _globalRep[user];
+    }
+}

@@ -1,0 +1,46 @@
+import { DeployFunction } from "hardhat-deploy/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const { deployments, getNamedAccounts, ethers } = hre;
+  const { deployer } = await getNamedAccounts();
+
+  const membership = await deployments.get("MembershipPass1155");
+  const registrar = await deployments.get("Registrar");
+  const marketplace = await deployments.get("MembershipMarketplace");
+
+  const membershipContract = await ethers.getContractAt(
+    "MembershipPass1155",
+    membership.address
+  );
+  const registrarContract = await ethers.getContractAt(
+    "Registrar",
+    registrar.address
+  );
+  const marketplaceContract = await ethers.getContractAt(
+    "MembershipMarketplace",
+    marketplace.address
+  );
+
+  // Grant Registrar -> Membership.REGISTRAR_ROLE
+  const REGISTRAR_ROLE = await membershipContract.REGISTRAR_ROLE();
+  let tx = await membershipContract.grantRole(REGISTRAR_ROLE, registrar.address);
+  await tx.wait();
+  console.log(`Granted REGISTRAR_ROLE to Registrar`);
+
+  // Grant Marketplace -> Membership.MARKETPLACE_ROLE
+  const MARKETPLACE_ROLE = await membershipContract.MARKETPLACE_ROLE();
+  tx = await membershipContract.grantRole(MARKETPLACE_ROLE, marketplace.address);
+  await tx.wait();
+  console.log(`Granted MARKETPLACE_ROLE to Marketplace`);
+
+  // Registrar: set marketplace address
+  tx = await registrarContract.setMarketplace(marketplace.address);
+  await tx.wait();
+  console.log(`Registrar marketplace set to: ${marketplace.address}`);
+
+  // Marketplace admin is deployer already (constructor), nothing else required.
+};
+
+export default func;
+func.tags = ["Wire"];
