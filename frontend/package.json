@@ -8,7 +8,11 @@
     "start": "next start -p 3000"
   },
   "dependencies": {
+    "@blocknote/core": "^0.45.0",
+    "@blocknote/mantine": "^0.45.0",
+    "@blocknote/react": "^0.45.0",
     "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-aspect-ratio": "^1.1.8",
     "@tailwindcss/forms": "^0.5.10",
     "@tanstack/react-query": "^5.90.10",
     "@wagmi/connectors": "^4.1.7",
@@ -17,6 +21,7 @@
     "ethers": "^6.15.0",
     "lucide-react": "^0.561.0",
     "next": "15.5.2",
+    "next-themes": "^0.4.6",
     "prosemirror-history": "^1.5.0",
     "prosemirror-model": "^1.25.4",
     "prosemirror-state": "^1.4.4",
