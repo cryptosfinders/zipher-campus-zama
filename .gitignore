@@ -1,2 +1,30 @@
+# Node
+node_modules/
+.pnpm-store/
 
-.env.local
+# Next.js
+.next/
+out/
+.vercel/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+
+# Hardhat
+cache/
+artifacts/
+
+# Convex
+.convex/
+
