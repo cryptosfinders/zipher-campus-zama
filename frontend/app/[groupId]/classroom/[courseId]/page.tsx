@@ -3,15 +3,22 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { CoursePageClient } from "@/features/classroom/components/course/course-page-client";
 
-export default async function CoursePage({
-  params,
-}: {
-  params: { groupId: string; courseId: string };
-}) {
-  const groupId = params.groupId as Id<"groups">;
-  const courseId = params.courseId as Id<"courses">;
+type PageProps = {
+  params: Promise<{
+    groupId: string;
+    courseId: string;
+  }>;
+};
 
-  const course = await fetchQuery(api.courses.getById, { id: courseId });
+export default async function CoursePage({ params }: PageProps) {
+  const { groupId, courseId } = await params;
+
+  const groupIdTyped = groupId as Id<"groups">;
+  const courseIdTyped = courseId as Id<"courses">;
+
+  const course = await fetchQuery(api.courses.getById, {
+    id: courseIdTyped,
+  });
 
   if (!course) {
     return <div>Course not found</div>;
@@ -19,9 +26,8 @@ export default async function CoursePage({
 
   return (
     <CoursePageClient
-      groupId={groupId}
-      courseId={courseId}
+      groupId={groupIdTyped}
+      courseId={courseIdTyped}
     />
   );
 }
-

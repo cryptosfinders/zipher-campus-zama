@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteEditor } from "@/components/blocknote-client";
+import BlockNoteEditor from "@/components/blocknote-client";
 import { useMutation } from 'convex/react'
 import { AlertOctagon } from 'lucide-react'
 import { toast } from 'sonner'

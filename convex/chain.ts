@@ -1,7 +1,7 @@
 // convex/chain.ts
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, encodeFunctionData, http } from "viem";
 
 import {
   SEPOLIA_RPC_URL,
@@ -32,15 +32,11 @@ export const registerOnChain = action({
     recipients: v.array(v.string()),
     shares: v.array(v.number()),
     duration: v.number(),
-    transferCooldown: v.number(),
-    creator: v.string(), // wallet address
+    transferCooldown: v.number()
   },
 
   handler: async (_ctx, args) => {
-    const client = fhevmClient;
-
-    const txHash = await client.writeContract({
-      address: REGISTRAR_CONTRACT_ADDRESS,
+    const calldata = encodeFunctionData({
       abi: RegistrarABI.abi,
       functionName: "registerCourse",
       args: [
@@ -51,9 +47,11 @@ export const registerOnChain = action({
         args.duration,
         args.transferCooldown,
       ],
-      account: args.creator,
     });
 
-    return txHash;
+    return {
+      to: REGISTRAR_CONTRACT_ADDRESS,
+      data: calldata,
+    };
   },
 });
