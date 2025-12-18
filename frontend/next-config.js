@@ -56,7 +56,7 @@ const nextConfig = {
     config.resolve.alias["@/components"] = path.resolve("./src/components");
     config.resolve.alias["@/blockchain"] = path.resolve("../blockchain");
     config.resolve.alias["@/relayer"] = path.resolve("../relayer");
-    config.resolve.alias["@/convex"] = path.resolve(__dirname, "../convex");
+    config.resolve.alias["@/convex"] = path.resolve(__dirname, "@/convex");
 
     config.infrastructureLogging = config.infrastructureLogging || {};
     config.infrastructureLogging.level = "error";

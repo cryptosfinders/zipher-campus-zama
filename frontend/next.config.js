@@ -58,7 +58,7 @@ outputFileTracingRoot: __dirname,
       "@/providers": path.resolve("/providers"),
 
       // 🚀 FINAL FIX: absolute convex alias
-      "@/convex": path.resolve(process.cwd(), "../convex"),
+      "@/convex": path.resolve(process.cwd(), "@/convex"),
       tslib: require.resolve("tslib"),
   };
 
