@@ -1,13 +1,10 @@
-import { notFound } from 'next/navigation'
-
-import { fetchQuery } from 'convex/nextjs'
-
-import { api } from '@/convex/_generated/api'
-import type { Id } from '@/convex/_generated/dataModel'
-import { GroupLayoutShell } from '@/features/groups/components/group-layout-shell'
+// frontend/app/[groupId]/layout.tsx
+import type { ReactNode } from "react"
+import { GroupLayoutShell } from "@/features/groups/components/group-layout-shell"
+import type { Id } from "@/convex/_generated/dataModel"
 
 type GroupLayoutProps = {
-  children: React.ReactNode
+  children: ReactNode
   params: Promise<{
     groupId: string
   }>
@@ -15,33 +12,13 @@ type GroupLayoutProps = {
 
 export default async function GroupLayout({
   children,
-  params
+  params,
 }: GroupLayoutProps) {
-  const resolvedParams = await params
-  const rawGroupId = resolvedParams.groupId
-
-  try {
-    const group = await fetchQuery(api.groups.get, {
-      id: rawGroupId as Id<'groups'>
-    })
-
-    if (!group) {
-      notFound()
-    }
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.message.includes('ArgumentValidationError') ||
-        error.message.includes('Found ID'))
-    ) {
-      notFound()
-    }
-    throw error
-  }
-
-  const groupId = rawGroupId as Id<'groups'>
+  const { groupId } = await params
 
   return (
-    <GroupLayoutShell groupId={groupId}>{children}</GroupLayoutShell>
+    <GroupLayoutShell groupId={groupId as Id<"groups">}>
+      {children}
+    </GroupLayoutShell>
   )
 }

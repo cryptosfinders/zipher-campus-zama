@@ -11,30 +11,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(public)/layout": [
+    "/[groupId]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(public)/layout.js"
+      "static/chunks/app/[groupId]/layout.js"
     ],
-    "/(public)/marketplace/page": [
+    "/[groupId]/edit/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(public)/marketplace/page.js"
+      "static/chunks/app/[groupId]/edit/page.js"
     ],
-    "/memberships/page": [
+    "/[groupId]/about/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/memberships/page.js"
-    ],
-    "/groups/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/groups/page.js"
-    ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/[groupId]/about/page.js"
     ]
   }
 }

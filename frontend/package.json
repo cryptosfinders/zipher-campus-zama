@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev:all": "concurrently \"pnpm next\" \"pnpm convex\"",
-    "next": "next dev",
+    "next": "NODE_OPTIONS=--max-old-space-size=6144 next dev",
     "convex": "convex dev",
     "build": "next build",
     "start": "next start -p 3000"
