@@ -153,7 +153,7 @@ async function sendNativeTx(params: {
 /*                                Validation                                  */
 /* -------------------------------------------------------------------------- */    
 
-const DEFAULT_VALUES: CreateGroupFormValues = {
+const DEFAULT_VALUES = {
   name: '',
   shortDescription: '',
   aboutUrl: '',
@@ -163,7 +163,7 @@ const DEFAULT_VALUES: CreateGroupFormValues = {
   visibility: 'private',
   billingCadence: 'free',
   price: ''
-}
+} satisfies CreateGroupFormValues
 
 /* -------------------------------------------------------------------------- */
 /*                               MAIN PAGE                                    */

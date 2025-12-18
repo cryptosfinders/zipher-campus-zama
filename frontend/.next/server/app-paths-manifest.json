@@ -1,4 +1,6 @@
 {
-  "/[groupId]/edit/page": "app/[groupId]/edit/page.js",
-  "/[groupId]/about/page": "app/[groupId]/about/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/memberships/page": "app/memberships/page.js",
+  "/[groupId]/edit/page": "app/[groupId]/edit/page.js"
 }
