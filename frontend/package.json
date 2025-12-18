@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev:all": "concurrently \"pnpm next\" \"pnpm convex\"",
+    "dev": "next dev",
+    "dev:all": "concurrently \"pnpm dev\" \"pnpm convex\"",
     "next": "NODE_OPTIONS=--max-old-space-size=6144 next dev",
     "convex": "convex dev",
     "build": "next build",
