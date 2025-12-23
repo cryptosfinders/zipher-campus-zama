@@ -4,12 +4,10 @@ import { useState } from 'react';
 import { Wallet, LogOut, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWallet } from '@/lib/web3/WalletProvider';
-import { useChainInfo } from '@/lib/web3/useChainInfo';
 import { shortenAddress } from '@/lib/shortenAddress';
 
 export function WalletMenu() {
-  const { address, connect, disconnect, balance } = useWallet();
-  const { chainName } = useChainInfo();
+  const { address, connect, disconnect } = useWallet();
   const [open, setOpen] = useState(false);
 
   if (!address) {
@@ -60,12 +58,12 @@ export function WalletMenu() {
         >
           <div className="px-3 py-2 text-sm text-muted-foreground">
             <span className="block">Network:</span>
-            <span className="text-primary font-semibold">{chainName}</span>
+            <span className="text-primary font-semibold">Connected</span>
           </div>
 
           <div className="px-3 py-2 text-sm text-muted-foreground">
-            <span className="block">Balance:</span>
-            <span className="text-white font-semibold">{balance} ETH</span>
+            <span className="block">Wallet:</span>
+            <span className="text-white font-semibold">Wallet connected</span>
           </div>
 
           <button

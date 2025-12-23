@@ -17,7 +17,11 @@ const ZIPHER_GOLD_BORDER = 'rgba(247, 201, 72, 0.32)'
 export function GroupSubscriptionBanner() {
   const { isOwner, subscription } = useGroupContext()
   const { renew, isRenewing } = useRenewSubscription()
-  const { label: platformFeeLabel } = usePlatformFeeQuote()
+  const { quote } = usePlatformFeeQuote()
+
+  const platformFeeLabel = quote
+  ? quote.displayAmount
+  : '—'
 
   const shouldShowBanner =
     isOwner && (subscription.isExpired || subscription.isRenewalDue)

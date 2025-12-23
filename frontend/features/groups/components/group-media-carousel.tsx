@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 
 import { useConvex } from 'convex/react'
 import { api } from '@/convex/_generated/api'
+import type { Id } from '@/convex/_generated/dataModel'
 
 /* ---------------------------------------------------------
  * EXTENDED MEDIA TYPES
@@ -164,11 +165,13 @@ export function GroupMediaCarousel({
       for (const src of sources ?? []) {
         if (isStorageReference(src)) {
           const storageId = extractStorageId(src)
-          if (storageId) {
-            try {
-              const { url } = await convex.query(api.media.getUrl, {
-                storageId
-              })
+if (storageId) {
+  try {
+    const id = storageId as Id<'_storage'>
+
+    const { url } = await convex.query(api.media.getUrl, {
+      storageId: id
+    })
               if (url) {
                 result.push(url)
                 continue

@@ -16,20 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/[groupId]/layout.js"
     ],
-    "/[groupId]/edit/page": [
+    "/[groupId]/about/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/[groupId]/edit/page.js"
-    ],
-    "/memberships/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/memberships/page.js"
-    ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/[groupId]/about/page.js"
     ]
   }
 }

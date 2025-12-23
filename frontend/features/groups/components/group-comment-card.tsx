@@ -41,7 +41,7 @@ export function GroupCommentCard({ comment }: GroupCommentCardProps) {
 
   const authorLabel =
     comment.author.displayName?.trim() ||
-    comment.author.email?.split('@')[0] ||
+    `${comment.author.walletAddress.slice(0, 6)}...${comment.author.walletAddress.slice(-4)}` ||
     'Unknown'
 
   const initials = authorLabel

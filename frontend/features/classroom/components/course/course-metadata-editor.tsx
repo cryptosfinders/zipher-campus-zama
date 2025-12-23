@@ -39,6 +39,19 @@ import { isStorageReference, toStorageSource } from '@/lib/media'
 
 import { cn } from '@/lib/utils'
 
+type CourseMetadataEditorProps = {
+  mode: 'create' | 'edit'
+  courseId?: Id<'courses'>
+  groupId: Id<'groups'>
+  title: string
+  description: string
+  thumbnailUrl?: string
+  onTitleChange: (value: string) => void
+  onDescriptionChange: (value: string) => void
+  onThumbnailChange?: (value?: string) => void
+  address?: `0x${string}`
+}
+
 export function CourseMetadataEditor({
   mode,
   courseId,
@@ -50,7 +63,7 @@ export function CourseMetadataEditor({
   onDescriptionChange,
   onThumbnailChange,
   address
-}) {
+}: CourseMetadataEditorProps) {
   const router = useAppRouter()
 
   const [dialogOpen, setDialogOpen] = useState(false)

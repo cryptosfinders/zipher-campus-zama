@@ -10,10 +10,9 @@ import { useForm } from 'react-hook-form'
 import { calculateFheFee } from "@/lib/fhe-pricing";
 import { useChainId, useWriteContract } from 'wagmi'
 
-import {
-  createGroupSchema,
-  type CreateGroupFormValues
-} from '@/features/groups/schemas/create-group-schema'
+import { createGroupSchema } from '@/features/groups/schemas/create-group-schema'
+import type { CreateGroupFormValues } from '@/features/groups/schemas/create-group-schema'
+import { sepolia } from 'wagmi/chains'
 
 import { Logo } from '@/components/layout/logo'
 import { ChainIndicator } from '@/components/layout/chain-indicator'
@@ -153,7 +152,7 @@ async function sendNativeTx(params: {
 /*                                Validation                                  */
 /* -------------------------------------------------------------------------- */    
 
-const DEFAULT_VALUES = {
+const DEFAULT_VALUES: CreateGroupFormValues = {
   name: '',
   shortDescription: '',
   aboutUrl: '',
@@ -163,7 +162,7 @@ const DEFAULT_VALUES = {
   visibility: 'private',
   billingCadence: 'free',
   price: ''
-} satisfies CreateGroupFormValues
+}
 
 /* -------------------------------------------------------------------------- */
 /*                               MAIN PAGE                                    */
@@ -319,15 +318,18 @@ export default function Create() {
       /* ------------ Preflight registrar.marketplace on ACTIVE chain -------- */
 
       let registrarMarketplace: `0x${string}` | null = null
-      try {
-        registrarMarketplace = (await client.readContract({
-          address: registrarAddress,
-          abi: registrarAbi,
-          functionName: 'marketplace'
-        })) as `0x${string}`
-      } catch (err) {
-        console.error('Failed to read registrar.marketplace', err)
-      }
+
+try {
+  const marketplace = await client.readContract({
+    address: registrarAddress,
+    abi: registrarAbi,
+    functionName: 'marketplace',
+  } as any)
+
+  registrarMarketplace = marketplace as `0x${string}`
+} catch (err) {
+  console.error('Failed to read registrar.marketplace', err)
+}
 
       if (
         !registrarMarketplace ||
@@ -399,6 +401,7 @@ export default function Create() {
 
       try {
         const regTx = await writeContractAsync({
+          chain: sepolia,
           account: currentAddress,
           address: registrarAddress,
           abi: registrarAbi,
@@ -456,10 +459,6 @@ export default function Create() {
 /* 🏪 Create encrypted marketplace listing (PAID ONLY)     */
 /* ------------------------------------------------------ */
 if (formattedPrice > 0) {
-  const submitEncryptedCourse = (
-    await import("@/convex/_generated/api")
-  ).api.encryptedCourses.submit;
-
   await submitEncryptedCourse({
     ciphertext: `ENCRYPTED_GROUP:${groupId}`,
     address: currentAddress,

@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from 'convex/react'
 import { toast } from 'sonner'
 import { Plus, Trash2, RefreshCcw } from 'lucide-react'
+import { walletClient } from '@/lib/onchain/network'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -185,7 +186,7 @@ const settingsSchema = z
     })
   })
 
-type GroupSettingsValues = z.infer<typeof settingsSchema>
+type GroupSettingsValues = z.input<typeof settingsSchema>
 
 type RegistrationState =
   | { status: 'checking' }
@@ -195,13 +196,22 @@ type RegistrationState =
 
 type GroupSettingsFormProps = {
   group: Doc<'groups'>
+  initialMedia?: {
+    thumbnailUrl: string | null
+    thumbnailSource: string | null
+    aboutUrl: string | null
+    gallery: {
+      url: string
+      source: string
+    }[]
+  }
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                MAIN COMPONENT                              */
 /* -------------------------------------------------------------------------- */
 
-export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
+export function GroupSettingsForm({ group,initialMedia }: GroupSettingsFormProps) {
   const { address } = useEthereumAccount()
   const client = useMemo(() => publicClient(), [])
 
@@ -222,7 +232,12 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
 
   const { renew: triggerRenewSubscription, isRenewing: isSubscriptionRenewing } =
     useRenewSubscription()
-  const { label: platformFeeLabel } = usePlatformFeeQuote()
+  const { quote, loading: platformFeeLoading } = usePlatformFeeQuote()
+
+const platformFeeLabel = useMemo(() => {
+  if (!quote) return '—'
+  return `${quote.displayAmount}% platform fee`
+}, [quote])
 
   const membershipCourseId = useMemo(
     () => resolveMembershipCourseId(group),
@@ -235,20 +250,18 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
 
 
   const membershipService = useMemo(() => {
-    if (!membershipAddress || !publicClient) return null
+    if (!membershipAddress) return null
     return new MembershipPassService({
-      publicClient,
       address: membershipAddress
     })
-  }, [membershipAddress, publicClient])
+  }, [membershipAddress])
 
   const registrarService = useMemo(() => {
-    if (!registrarAddress || !publicClient) return null
+    if (!registrarAddress) return null
     return new RegistrarService({
-      publicClient,
       address: registrarAddress
     })
-  }, [publicClient, registrarAddress])
+  }, [registrarAddress])
 
   const [registrationState, setRegistrationState] = useState<RegistrationState>(
     () =>
@@ -298,7 +311,7 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
       shortDescription: group.shortDescription ?? '',
       aboutUrl: group.aboutUrl ?? '',
       thumbnailUrl: initialThumbnailSource,
-      galleryUrls: initialGallerySources,
+      galleryUrls: initialGallerySources ?? [],
       tags: (group.tags ?? []).join(', '),
       visibility: group.visibility ?? 'private',
       billingCadence:
@@ -540,11 +553,14 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
     try {
       setIsRegisteringCourse(true)
 
-      const registrarMarketplace = (await client.readContract({
-        address: registrarAddress as `0x${string}`,
-        abi: registrarAbi,
-        functionName: 'marketplace'
-      })) as `0x${string}`
+      const registrarMarketplace = (await (
+  client.readContract as any
+)({
+  address: registrarAddress as `0x${string}`,
+  abi: registrarAbi,
+  functionName: 'marketplace',
+  args: []
+})) as `0x${string}`
 
       if (
         !registrarMarketplace ||
@@ -580,15 +596,34 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
         account: address as `0x${string}`
       })
 
-      const tx = await registrarService.registerCourse(
-        membershipCourseId,
-        membershipPriceAmount,
-        [ownerWalletAddress],
-        [10000],
-        BigInt(MEMBERSHIP_DURATION_SECONDS),
-        BigInt(MEMBERSHIP_TRANSFER_COOLDOWN_SECONDS)
-      )
-      await tx.wait()
+    // 1️⃣ Get wallet client (from wherever you already have it)
+const walletClient = (window as any).ethereum
+  ? await import('viem').then(({ createWalletClient, custom }) =>
+      createWalletClient({
+        transport: custom((window as any).ethereum)
+      })
+    )
+  : null
+
+if (!walletClient) {
+  toast.error('Wallet client not available. Connect your wallet.')
+  return
+}
+
+// 2️⃣ Call registrar service — EXACT ORDER
+const tx = await registrarService.registerCourse(
+  walletClient,                              // walletClient
+  ownerWalletAddress as `0x${string}`,       // owner
+  BigInt(membershipCourseId),                // courseId
+  membershipPriceAmount,                     // priceWei
+  [ownerWalletAddress],                      // recipients
+  [10000],                                   // sharesBps (100%)
+  BigInt(MEMBERSHIP_DURATION_SECONDS),       // duration
+  BigInt(MEMBERSHIP_TRANSFER_COOLDOWN_SECONDS) // cooldown
+)
+
+await tx.wait()
+      
       setRegistrationState({ status: 'registered' })
       toast.success('Membership course registered on-chain.')
     } catch (error: any) {

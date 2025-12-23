@@ -1,10 +1,4 @@
 {
-  "app/[groupId]/edit/page.tsx -> @/features/groups/components/group-description-editor": {
-    "id": "app/[groupId]/edit/page.tsx -> @/features/groups/components/group-description-editor",
-    "files": [
-      "static/chunks/_app-pages-browser_features_groups_components_group-description-editor_tsx.js"
-    ]
-  },
   "components/blocknote-client.tsx -> ./blocknote-editor-impl": {
     "id": "components/blocknote-client.tsx -> ./blocknote-editor-impl",
     "files": [

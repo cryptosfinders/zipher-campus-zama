@@ -24,13 +24,13 @@ export const createGroupSchema = z
     thumbnailUrl: z.string().optional(),
 
     // 🔑 REQUIRED (this is what broke your build earlier)
-    galleryUrls: z.array(z.string()).default([]),
+    galleryUrls: z.array(z.string()).optional(),
 
     tags: z.string().optional(),
 
-    visibility: z.enum(['public', 'private']).default('private'),
+    visibility: z.enum(['public', 'private']),
 
-    billingCadence: z.enum(['free', 'monthly']).default('free'),
+    billingCadence: z.enum(['free', 'monthly']),
 
     price: z.string().optional()
   })
@@ -76,7 +76,7 @@ export const createGroupSchema = z
       })
     }
 
-    data.galleryUrls.forEach((value, index) => {
+    data.galleryUrls?.forEach((value, index) => {
       if (!isValidMediaReference(value)) {
         ctx.addIssue({
           path: ['galleryUrls', index],

@@ -187,10 +187,8 @@ export function MediaDropzone({
             ? 'cursor-not-allowed opacity-70'
             : 'cursor-pointer',
 
-          {
             /* Normal border */
-            true: `border-[1.5px] border-[${ZIPHER_GOLD_BORDER}]`,
-          }[true],
+          `border-[1.5px] border-[${ZIPHER_GOLD_BORDER}]`,          
 
           /* Hover state */
           !disabled &&

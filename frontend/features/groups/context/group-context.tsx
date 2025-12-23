@@ -125,7 +125,8 @@ export function GroupProvider({
         try {
           const id = extractStorageId(raw)
           if (!id) return
-          const { url } = await convex.query(api.media.getUrl, { storageId: id })
+        const storageId = id as Id<'_storage'>  
+	const { url } = await convex.query(api.media.getUrl, { storageId })
           setResolvedThumbnailUrl(url ?? null)
         } catch (err) {
           console.error('Failed to resolve thumbnail from storage:', err)
@@ -156,8 +157,9 @@ export function GroupProvider({
           try {
             const id = extractStorageId(src)
             if (!id) continue
-            const { url } = await convex.query(api.media.getUrl, {
-              storageId: id
+            const storageId = id as Id<'_storage'>
+	    const { url } = await convex.query(api.media.getUrl, {
+              storageId
             })
             if (url) resolved.push(url)
           } catch (err) {

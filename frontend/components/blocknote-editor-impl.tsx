@@ -4,21 +4,30 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
 import { BlockNoteView } from "@blocknote/mantine";
-import { useCreateBlockNote } from "@blocknote/react";
+import type { BlockNoteEditor } from "@blocknote/core";
+
+type BlockNoteEditorImplProps = {
+  editor: BlockNoteEditor;
+  editable?: boolean;
+  theme?: "light" | "dark";
+  onChange?: () => void;
+  className?: string;
+};
 
 export default function BlockNoteEditorImpl({
-  value,
+  editor,
+  editable = false,
+  theme = "light",
   onChange,
-}: {
-  value?: any;
-  onChange?: (doc: any) => void;
-}) {
-  const editor = useCreateBlockNote({
-    initialContent: value,
-    onEditorContentChange: (editor) => {
-      onChange?.(editor.document);
-    },
-  });
-
-  return <BlockNoteView editor={editor} />;
+  className,
+}: BlockNoteEditorImplProps) {
+  return (
+    <BlockNoteView
+      editor={editor}
+      editable={editable}
+      theme={theme}
+      onChange={onChange}
+      className={className}
+    />
+  );
 }

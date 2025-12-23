@@ -22,23 +22,15 @@ import {
 } from '@/lib/config'
 
 import { ADDRESSES } from '@/lib/onchain/contracts'
+import { publicClient } from '@/lib/onchain/network'
 
 import { MembershipPassService } from '@/lib/onchain/services/membershipPassService'
 import { MarketplaceService } from '@/lib/onchain/services/marketplaceService'
 
-// ✅ REPLACEMENT FOR PUSHCHAIN PUBLIC CLIENT
-import {
-  getSepoliaPublicClient,
-  getFhevmPublicClient
-} from '@/lib/onchain/publicClients'
-
 import { parseNativeTokenAmount } from '@/lib/native-token'
 import { formatTimestampRelative } from '@/lib/time'
 import { useGroupContext } from '../context/group-context'
-import {
-  normalizePassExpiry,
-  resolveMembershipCourseId
-} from '../utils/membership'
+import { resolveMembershipCourseId } from '../utils/membership'
 import { formatGroupPriceLabel } from '../utils/price'
 
 // ✅ NEW WALLET HOOK (replaces usePushAccount)
@@ -61,19 +53,14 @@ type JoinPreparation = {
   skipPayment: boolean
   courseId: bigint | null
   amount: bigint
-  passExpiryMs?: number
 }
 
 export function JoinGroupButton() {
   const { group, owner, isOwner, isMember, membership } = useGroupContext()
   const { address, walletClient, chainId } = useWallet()
-
+  const pc = publicClient()
   // Determine which network to use
-  const publicClient = useMemo(() => {
-    return chainId === Number(ZIPHER_CHAIN_ID)
-      ? getFhevmPublicClient()
-      : getSepoliaPublicClient()
-  }, [chainId])
+  
 
   const joinGroup = useMutation(api.groups.join)
 
@@ -95,22 +82,20 @@ export function JoinGroupButton() {
   ) return null;
 
   return new MembershipPassService({
-    publicClient,
-    address: ADDRESSES.MEMBERSHIP
+   address: ADDRESSES.MEMBERSHIP
   });
-}, [publicClient]);
+}, [])
 
 const marketplaceService = useMemo(() => {
   if (
     !ADDRESSES.MARKETPLACE ||
-    ADDRESSES.MARKETPLACE === "0x0000000000000000000000000000000000000000"
-  ) return null;
+    ADDRESSES.MARKETPLACE === '0x0000000000000000000000000000000000000000'
+  ) return null
 
   return new MarketplaceService({
-    publicClient,
     address: ADDRESSES.MARKETPLACE
-  });
-}, [publicClient]);
+  })
+}, [])
 
   const membershipCourseId = useMemo(
     () => resolveMembershipCourseId(group),
@@ -136,46 +121,27 @@ const marketplaceService = useMemo(() => {
     const price = group.price ?? 0
     const requiresPayment = price > 0
     let skipPayment = false
-    let passExpiryMs: number | undefined
 
-    // Detect existing pass
-    if (
-      requiresPayment &&
-      membershipService &&
-      marketplaceService &&
+  
+    // Detect existing pass via ERC-1155 balance
+if (
+  requiresPayment &&
+  membershipService &&
+  membershipCourseId
+) {
+  try {
+    const passBalance = await membershipService.balanceOf(
+      blockchainAddress as Address,
       membershipCourseId
-    ) {
-      try {
-        const [active, state] = await Promise.all([
-          membershipService.isPassActive(
-            membershipCourseId,
-            blockchainAddress as Address
-          ),
-          membershipService.getPassState(
-            membershipCourseId,
-            blockchainAddress as Address
-          )
-        ])
+    )
 
-        if (active) {
-          skipPayment = true
-          passExpiryMs = normalizePassExpiry(state.expiresAt)
-        }
-      } catch (err) {
-        console.error('Pass check error:', err)
-      }
-    }
-
-    // Local membership
-    if (
-      requiresPayment &&
-      !skipPayment &&
-      membership?.passExpiresAt &&
-      membership.passExpiresAt > Date.now()
-    ) {
+    if ((passBalance as bigint) > 0n) {
       skipPayment = true
-      passExpiryMs = membership.passExpiresAt
     }
+  } catch (err) {
+    console.error('Pass balance check error:', err)
+}
+}
 
     const amount =
       requiresPayment && !skipPayment
@@ -184,11 +150,11 @@ const marketplaceService = useMemo(() => {
 
     // Balance check
     if (requiresPayment && !skipPayment) {
-      const balance = await publicClient.getBalance({
+      const nativeBalance = await pc.getBalance({
         address: blockchainAddress as Address
-      })
+      }) as bigint
 
-      if (balance < amount) {
+      if (nativeBalance < amount) {
         toast.error(`Insufficient ${NATIVE_TOKEN_SYMBOL} to join.`)
         return null
       }
@@ -198,88 +164,73 @@ const marketplaceService = useMemo(() => {
       requiresPayment,
       skipPayment,
       courseId: membershipCourseId,
-      amount,
-      passExpiryMs
+      amount
     }
   }, [
     blockchainAddress,
     group.price,
     membershipCourseId,
-    membership?.passExpiresAt,
     membershipService,
     marketplaceService,
     owner?.walletAddress,
-    publicClient
+    walletClient
   ])
 
   /* ---------------------------- FINALIZE JOIN ----------------------------- */
 
-  const finalizeJoin = useCallback(
-    async (prep: JoinPreparation) => {
-      if (!backendAddress) {
-        toast.error('Connect your wallet to continue.')
-        return
-      }
+ const finalizeJoin = useCallback(
+  async (prep: JoinPreparation) => {
+    if (!backendAddress) {
+      toast.error('Connect your wallet to continue.')
+      return
+    }
 
-      let txHash: `0x${string}` | undefined
-      let passExpiryMs = prep.passExpiryMs
+    let txHash: `0x${string}` | undefined
 
-      try {
-        setIsFinalizing(true)
+    try {
+      setIsFinalizing(true)
 
-        if (prep.requiresPayment && !prep.skipPayment) {
-          if (!marketplaceService || !membershipService || !prep.courseId) {
-            toast.error('Marketplace not ready.')
-            return
-          }
-
-          // ⛓️ On-chain purchase using viem walletClient
-          const tx = await walletClient.writeContract({
-            address: marketplaceService.address,
-            abi: marketplaceService.abi,
-            functionName: 'purchasePrimary',
-            args: [prep.courseId, prep.amount],
-            value: prep.amount
-          })
-
-          txHash = tx as `0x${string}`
-
-          // Confirm pass
-          const state = await membershipService.getPassState(
-            prep.courseId,
-            blockchainAddress as Address
-          )
-          passExpiryMs = normalizePassExpiry(state.expiresAt)
+      if (prep.requiresPayment && !prep.skipPayment) {
+        if (!marketplaceService || !prep.courseId) {
+          toast.error('Marketplace not ready.')
+          return
         }
 
-        await joinGroup({
-          groupId: group._id,
-          memberAddress: backendAddress,
-          txHash,
-          hasActivePass: prep.skipPayment,
-          passExpiresAt: passExpiryMs
-        })
+        const tx = await marketplaceService.purchasePrimary(
+	 walletClient,
+	 blockchainAddress as Address,
+	 prep.courseId,
+	 prep.amount
+	)
 
-        toast.success('Welcome to the group!')
-      } catch (err) {
-        console.error(err)
-        toast.error('Joining failed.')
-      } finally {
-        setIsFinalizing(false)
-        setPendingJoin(null)
-        setConfirmationOpen(false)
+        txHash = tx as `0x${string}`
       }
-    },
-    [
-      backendAddress,
-      blockchainAddress,
-      group._id,
-      joinGroup,
-      marketplaceService,
-      membershipService,
-      walletClient
-    ]
-  )
+
+      await joinGroup({
+        groupId: group._id,
+        memberAddress: backendAddress,
+        txHash,
+        hasActivePass: prep.skipPayment
+      })
+
+      toast.success('Welcome to the group!')
+    } catch (err) {
+      console.error(err)
+      toast.error('Joining failed.')
+    } finally {
+      setIsFinalizing(false)
+      setPendingJoin(null)
+      setConfirmationOpen(false)
+    }
+  },
+  [
+    backendAddress,
+    group._id,
+    joinGroup,
+    marketplaceService,
+    walletClient
+  ]
+)         
 
   /* ----------------------------- BUTTON STATES ---------------------------- */
 
@@ -325,8 +276,7 @@ const marketplaceService = useMemo(() => {
 
   const busy = isPreparing || isFinalizing
   const priceLabel = formatGroupPriceLabel(group.price, group.billingCadence, {
-    includeCadence: true,
-    usdRate: pushUsdRate
+    includeCadence: true
   })
 
   const ctaLabel = group.price ? `Join ${priceLabel}` : 'Join for free'

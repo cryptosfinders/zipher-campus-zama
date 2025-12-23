@@ -13,6 +13,7 @@ import { useGroupContext } from '@/features/groups/context/group-context'
 import { useConvex } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { extractStorageId, isStorageReference } from '@/lib/media'
+import type { Id } from '@/convex/_generated/dataModel'
 
 /* ============================================================
    🚨 CRITICAL FIX: Lazy-load BlockNote editor (NO SSR)
@@ -56,8 +57,10 @@ export default function GroupEditPage(_props: GroupEditPageProps) {
         /* --- THUMBNAIL --- */
         if (group.thumbnailUrl) {
           if (isStorageReference(group.thumbnailUrl)) {
-            const id = extractStorageId(group.thumbnailUrl)
-            const { url } = await convex.query(api.media.getUrl, { storageId: id })
+            const id = extractStorageId(group.thumbnailUrl) as Id<'_storage'>
+
+	const { url } = await convex.query(api.media.getUrl, { storageId: id })
+
             if (!cancelled) setResolvedThumbnail(url ?? null)
           } else {
             setResolvedThumbnail(group.thumbnailUrl)
@@ -69,8 +72,12 @@ export default function GroupEditPage(_props: GroupEditPageProps) {
         /* --- ABOUT URL --- */
         if (group.aboutUrl) {
           if (isStorageReference(group.aboutUrl)) {
-            const id = extractStorageId(group.aboutUrl)
-            const { url } = await convex.query(api.media.getUrl, { storageId: id })
+            const id = extractStorageId(
+  group.aboutUrl
+) as Id<'_storage'>
+
+const { url } = await convex.query(api.media.getUrl, { storageId: id })
+
             if (!cancelled) setResolvedAboutUrl(url ?? null)
           } else {
             setResolvedAboutUrl(group.aboutUrl)
@@ -83,8 +90,12 @@ export default function GroupEditPage(_props: GroupEditPageProps) {
         const resolved: string[] = []
         for (const img of group.galleryUrls ?? []) {
           if (isStorageReference(img)) {
-            const id = extractStorageId(img)
-            const { url } = await convex.query(api.media.getUrl, { storageId: id })
+            const id = extractStorageId(
+  img
+) as Id<'_storage'>
+
+const { url } = await convex.query(api.media.getUrl, { storageId: id })
+
             if (url) resolved.push(url)
           } else {
             resolved.push(img)

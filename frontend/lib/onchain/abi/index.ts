@@ -1,4 +1,5 @@
 // frontend/lib/onchain/abi/index.ts
+import type { Abi } from 'viem'
 
 // Export structured TypeScript ABIs (from abis.ts)
 export * from './abis'
@@ -12,13 +13,13 @@ import RevenueSplitRouterArtifact from './artifacts/RevenueSplitRouter.json'
 import SplitPayoutArtifact from './artifacts/SplitPayout.json'
 
 // viem-ready ABI arrays:
-export const registrarAbi = RegistrarArtifact.abi as const
-export const marketplaceAbi = MarketplaceArtifact.abi as const
-export const membershipPass1155Abi = MembershipPass1155Artifact.abi as const
-export const badge1155Abi = Badge1155Artifact.abi as const
+export const registrarAbi = RegistrarArtifact.abi as Abi
+export const marketplaceAbi = MarketplaceArtifact.abi as Abi
+export const membershipPass1155Abi = MembershipPass1155Artifact.abi as Abi
+export const badge1155Abi = Badge1155Artifact.abi as Abi
 export const revenueSplitRouterAbi =
-  RevenueSplitRouterArtifact.abi as const
-export const splitPayoutAbi = SplitPayoutArtifact.abi as const
+  RevenueSplitRouterArtifact.abi as Abi
+export const splitPayoutAbi = SplitPayoutArtifact.abi as Abi
 
 // Optional: export full artifacts if you ever need bytecode/metadata
 export { default as registrarArtifact } from './artifacts/Registrar.json'

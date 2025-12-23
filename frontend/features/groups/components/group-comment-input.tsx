@@ -29,8 +29,9 @@ export function GroupCommentInput({ postId }: GroupCommentInputProps) {
 
   const displayName =
     currentUser?.displayName?.trim() ||
-    currentUser?.email?.split('@')[0] ||
-    'User'
+    (currentUser?.walletAddress
+    ? `${currentUser.walletAddress.slice(0, 6)}...${currentUser.walletAddress.slice(-4)}`
+    : 'User')
 
   const initials = displayName
     .split(' ')

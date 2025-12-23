@@ -60,7 +60,7 @@ export function GroupCard({
   const priceLabel = formatGroupPriceLabel(
     group.price,
     group.billingCadence,
-    { includeCadence: true, usdRate: null }
+    { includeCadence: true }
   )
 
   return (

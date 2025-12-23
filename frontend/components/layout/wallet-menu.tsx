@@ -5,7 +5,7 @@ import { ChevronDown, LogOut, Wallet, RefreshCw } from 'lucide-react';
 import { useWallet } from '@/lib/web3/WalletProvider';
 import { shortenAddress } from '@/lib/utils';
 import { switchChain } from '@/lib/onchain/wallet';
-import { getEthersProvider } from '@/lib/onchain/wallet';
+
 import { Button } from '@/components/ui/button';
 
 const CHAINS = {
@@ -18,7 +18,6 @@ export function WalletMenu() {
   const {
     address,
     chainId,
-    balance,
     connect,
     disconnect,
     walletClient
@@ -60,10 +59,10 @@ export function WalletMenu() {
                 p-3 space-y-3 z-50
               "
             >
-              {/* Balance */}
-              <div className="text-sm font-medium text-primary">
-                Balance: {balance} ETH
-              </div>
+              {/* Wallet Connected */}
+              <div className="text-sm font-medium text-muted-foreground">
+  Wallet connected
+</div>
 
               {/* Chain */}
               <div className="space-y-2">

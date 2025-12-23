@@ -59,7 +59,7 @@ export function MembershipsShell() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {myEncryptedCourses.map((course) => (
   <EncryptedCourseCard
-    key={course.groupId ?? course.id}
+    key={course.groupId}
     item={course}
   />
 ))}
@@ -69,3 +69,5 @@ export function MembershipsShell() {
     </div>
   );
 }
+
+export default MembershipsShell

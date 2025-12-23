@@ -20,7 +20,7 @@ export function EncryptedMarketplaceShell() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.map((c) => (
-        <EncryptedCourseCard key={c.courseId} item={c} />
+        <EncryptedCourseCard key={c.id} item={c} />
       ))}
     </div>
   );

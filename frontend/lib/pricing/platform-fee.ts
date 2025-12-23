@@ -55,7 +55,7 @@ type BalanceCheckResult =
 export async function validatePlatformFeeBalance(opts: {
   quote: PlatformFeeQuote
   userAddress: `0x${string}`
-  publicClient: PublicClient
+  publicClient: Pick<PublicClient, 'getBalance'>
 }): Promise<BalanceCheckResult> {
   const balance = await opts.publicClient.getBalance({
     address: opts.userAddress
@@ -70,3 +70,4 @@ export async function validatePlatformFeeBalance(opts: {
 
   return { ok: true, reason: '' }
 }
+

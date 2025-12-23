@@ -7,14 +7,18 @@ import { PLATFORM_TREASURY_ADDRESS } from '@/lib/config'
 
 import { useEthereumAccount } from '@/hooks/use-ethereum-account'
 import { useUniversalTransaction } from '@/hooks/use-universal-transaction'
+import { useWallet } from '@/lib/web3/WalletProvider'
 
 import {
   resolvePlatformFeeQuote,
   validatePlatformFeeBalance
 } from '@/lib/pricing/platform-fee'
 
-import { getSepoliaPublicClient } from '@/lib/onchain/publicClients'
+import { getSepoliaPublicClient,
+  getFhevmPublicClient } from '@/lib/onchain/publicClients'
+import { ZIPHER_CHAIN_ID } from '@/lib/config'
 import { useGroupContext } from '../context/group-context'
+import type { PublicClient } from 'viem'
 
 type RenewResult = {
   endsOn: number | null
@@ -25,8 +29,15 @@ export function useRenewSubscription() {
   const { group } = useGroupContext()
   const { address } = useEthereumAccount()
   const { sendTransaction } = useUniversalTransaction()
+  const { chainId } = useWallet()
 
-  const publicClient = useMemo(() => getSepoliaPublicClient(), [])
+  const publicClient = useMemo(() => {
+  if (!chainId) return getSepoliaPublicClient()
+
+  return chainId === Number(ZIPHER_CHAIN_ID)
+    ? getFhevmPublicClient()
+    : getSepoliaPublicClient()
+}, [chainId])
 
   const { mutate, pending: isMutating } = useApiMutation(
     api.groups.renewSubscription
@@ -57,10 +68,12 @@ export function useRenewSubscription() {
 
       if (!check.ok) throw new Error(check.reason)
 
-      const txHash = await sendTransaction({
-        to: treasuryAddress,
-        value: feeQuote.amountWei
-      })
+      const txResult = await sendTransaction({
+      to: treasuryAddress,
+      value: feeQuote.amountWei
+	})
+
+     const txHash = txResult.hash
 
       const result = await mutate({
         groupId: group._id,

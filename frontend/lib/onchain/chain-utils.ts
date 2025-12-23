@@ -1,8 +1,8 @@
 // frontend/lib/onchain/chain-utils.ts
-import { createPublicClient, http, type PublicClient } from 'viem';
+import { createPublicClient, http } from 'viem';
 import { getSepoliaPublicClient, getFhevmPublicClient } from './publicClients';
 
-export function getPublicClientForRpc(rpcUrl: string): PublicClient {
+export function getPublicClientForRpc(rpcUrl: string) {
   return createPublicClient({
     transport: http(rpcUrl)
   });

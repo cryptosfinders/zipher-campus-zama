@@ -1,5 +1,4 @@
 // frontend/lib/fhe-pricing.ts
-import { COINGECKO_API_KEY } from "@/lib/config";
 
 export function calculateFheFee() {
   // Fake dynamic numbers for demo

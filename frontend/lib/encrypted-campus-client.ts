@@ -83,13 +83,12 @@ export class EncryptedCampusClient {
     const { groupLabel, user, isActive } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "setMembership",
       args: [this.groupId(groupLabel), user, isActive],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -109,7 +108,7 @@ export class EncryptedCampusClient {
       abi: encryptedCampusAbi,
       functionName: "getMembershipHandle",
       args: [this.groupId(groupLabel), user],
-    })) as Hex
+    } as any)) as Hex
 
     return handle
   }
@@ -127,13 +126,12 @@ export class EncryptedCampusClient {
     const { groupLabel, user, initialValue } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "initReputation",
       args: [this.groupId(groupLabel), user, initialValue],
       account: this.wc!.account!,
-    })
+    }as any)
 
     return hash
   }
@@ -147,13 +145,12 @@ export class EncryptedCampusClient {
     const { groupLabel, user, delta } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "addReputation",
       args: [this.groupId(groupLabel), user, delta],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -169,7 +166,7 @@ export class EncryptedCampusClient {
       abi: encryptedCampusAbi,
       functionName: "getReputationHandle",
       args: [this.groupId(groupLabel), user],
-    })) as Hex
+    } as any)) as Hex
 
     return handle
   }
@@ -183,13 +180,12 @@ export class EncryptedCampusClient {
     const { pollLabel, maxOption } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "createPoll",
       args: [this.pollId(pollLabel), maxOption],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -199,13 +195,12 @@ export class EncryptedCampusClient {
     const { pollLabel } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "sealPoll",
       args: [this.pollId(pollLabel)],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -223,13 +218,12 @@ export class EncryptedCampusClient {
     const { pollLabel, encOptionHandle, inputProof } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "castVoteEncrypted",
       args: [this.pollId(pollLabel), encOptionHandle, inputProof],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -245,7 +239,7 @@ export class EncryptedCampusClient {
       abi: encryptedCampusAbi,
       functionName: "getTallyHandle",
       args: [this.pollId(pollLabel), option],
-    })) as Hex
+    } as any)) as Hex
 
     return handle
   }
@@ -262,13 +256,12 @@ export class EncryptedCampusClient {
     const { metricLabel, delta } = opts
 
     const hash = await this.wc!.writeContract({
-      chainId: ACTIVE_CHAIN_ID,
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "incrementMetric",
       args: [this.metricId(metricLabel), delta],
       account: this.wc!.account!,
-    })
+    } as any)
 
     return hash
   }
@@ -281,7 +274,7 @@ export class EncryptedCampusClient {
       abi: encryptedCampusAbi,
       functionName: "getMetricHandle",
       args: [this.metricId(metricLabel)],
-    })) as Hex
+    } as any)) as Hex
 
     return handle
   }

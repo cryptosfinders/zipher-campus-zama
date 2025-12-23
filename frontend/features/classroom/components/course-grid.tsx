@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 import { LoadingIndicator } from '@/components/feedback/loading-indicator'
 import { api } from '@/convex/_generated/api'
-import type { Doc, Id } from '@/context/_generated/dataModel'
+import type { Doc, Id } from '@/convex/_generated/dataModel'
 
 import { CourseCard } from './course-card'
 import { CreateCourseDialog } from './create-course-dialog'

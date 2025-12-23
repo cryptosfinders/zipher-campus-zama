@@ -237,7 +237,10 @@ export function GroupMediaFields<FormValues extends GroupMediaFormShape>({
         if (!url) thumbnailObjectUrlRef.current = resolvedUrl
 
         // 5) Save metadata row
-        await saveMedia({ storageId, url: resolvedUrl })
+        await saveMedia({
+  storageId: storageId as Id<'_storage'>,
+  url: resolvedUrl
+})
 
         // 6) Update form + UI (store storage:xxxx reference)
         setThumbnailPreview(resolvedUrl)
@@ -353,7 +356,10 @@ export function GroupMediaFields<FormValues extends GroupMediaFormShape>({
           const resolvedUrl = url ?? URL.createObjectURL(file)
           if (!url) galleryObjectUrlsRef.current.push(resolvedUrl)
 
-          await saveMedia({ storageId, url: resolvedUrl })
+          await saveMedia({
+  storageId: storageId as Id<'_storage'>,
+  url: resolvedUrl
+})
 
           uploaded.push({
             id: generateGalleryId(storageId),

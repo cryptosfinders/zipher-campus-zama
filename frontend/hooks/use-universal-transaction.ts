@@ -57,7 +57,7 @@ export function useUniversalTransaction() {
             to: params.to,
             data: params.data,
             value: params.valueWei
-          })
+          } as any)
         } else {
           // Contract call
           const { address, abi, functionName, args, value } =
@@ -70,7 +70,7 @@ export function useUniversalTransaction() {
             functionName,
             args: args ?? [],
             value
-          })
+          } as any)
         }
 
         return { hash }

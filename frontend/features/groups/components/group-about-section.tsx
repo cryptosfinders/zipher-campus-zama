@@ -12,6 +12,8 @@ import {
 
 import { useRouter } from 'next/navigation'
 
+import type { Id } from '@/convex/_generated/dataModel'
+
 import { formatTimestampRelative } from '@/lib/time'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GroupDescriptionEditor } from './group-description-editor'
@@ -51,8 +53,9 @@ export function GroupAboutSection() {
       /** THUMBNAIL */
       if (group.thumbnailUrl) {
         if (isStorageReference(group.thumbnailUrl)) {
-          const id = extractStorageId(group.thumbnailUrl)
-          const { url } = await convex.query(api.media.getUrl, { storageId: id })
+        const id = extractStorageId(group.thumbnailUrl) as Id<'_storage'>
+	const { url } = await convex.query(api.media.getUrl, { storageId: id })
+
           setResolvedThumbnail(url ?? null)
         } else {
           setResolvedThumbnail(group.thumbnailUrl)
@@ -64,8 +67,11 @@ export function GroupAboutSection() {
       /** ABOUT URL */
       if (group.aboutUrl) {
         if (isStorageReference(group.aboutUrl)) {
-          const id = extractStorageId(group.aboutUrl)
-          const { url } = await convex.query(api.media.getUrl, { storageId: id })
+          const id = extractStorageId(
+  group.aboutUrl
+) as Id<'_storage'>
+
+const { url } = await convex.query(api.media.getUrl, { storageId: id })
           setResolvedAboutUrl(url ?? null)
         } else {
           setResolvedAboutUrl(group.aboutUrl)
@@ -80,8 +86,11 @@ export function GroupAboutSection() {
 
       for (const item of gallery) {
         if (isStorageReference(item)) {
-          const id = extractStorageId(item)
-          const { url } = await convex.query(api.media.getUrl, { storageId: id })
+          const id = extractStorageId(
+    item
+  ) as Id<'_storage'>
+
+  const { url } = await convex.query(api.media.getUrl, { storageId: id })
           if (url) resolved.push(url)
         } else {
           resolved.push(item)
@@ -140,12 +149,12 @@ export function GroupAboutSection() {
 
   const membershipExpiryLabel = useMemo(() => {
     if (membership.status !== 'active' || isAdmin) return null
-    if (!membership.expiresAt) return 'No expiry scheduled'
-    const expiry = membership.expiresAt
+    if (!membership.passExpiresAt) return 'No expiry scheduled'
+    const expiry = membership.passExpiresAt
     return `${new Date(expiry).toLocaleString()} (${formatTimestampRelative(
       Math.floor(expiry / 1000)
     )})`
-  }, [isAdmin, membership.status, membership.expiresAt])
+  }, [isAdmin, membership.status, membership.passExpiresAt])
 
   const privacy =
     group.visibility === 'public'
