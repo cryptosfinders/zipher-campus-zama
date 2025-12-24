@@ -18,6 +18,7 @@ export const login = mutation({
         displayName: null,
         avatarUrl: null,
         about: null,
+        createdAt: Date.now(),
       });
     }
 

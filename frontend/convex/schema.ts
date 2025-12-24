@@ -4,11 +4,13 @@ import { v } from 'convex/values'
 
 export default defineSchema({
   // 🔹 Users
+  // 🔹 Users
   users: defineTable({
   walletAddress: v.string(),
   displayName: v.optional(v.union(v.string(), v.null())),
   avatarUrl: v.optional(v.union(v.string(), v.null())),
-  about: v.optional(v.union(v.string(), v.null()))
+  about: v.optional(v.union(v.string(), v.null())),
+  createdAt: v.optional(v.number())
 }).index('by_wallet', ['walletAddress']),
 
   // 🔹 Groups (communities / campuses)

@@ -48,8 +48,8 @@
     "tailwindcss": "^3.4.14",
     "tailwindcss-animate": "^1.0.7",
     "tslib": "^2.8.1",
-    "viem": "^2.7.0",
-    "wagmi": "^2.7.0",
+    "viem": "2.9.31",
+    "wagmi": "2.8.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {

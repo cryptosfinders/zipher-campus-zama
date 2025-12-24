@@ -10,7 +10,7 @@ import {
   http,
   type Chain,
   type PublicClient,
-  type WalletClient
+  type WalletClient,
 } from 'viem'
 import { sepolia } from 'viem/chains'
 
@@ -111,7 +111,8 @@ export function publicClient(): PublicClient {
   if (!_publicClient) {
     _publicClient = createPublicClient({
       chain: ACTIVE_CHAIN,
-      transport: http(ACTIVE_RPC_URL)
+      transport: http(ACTIVE_RPC_URL),
+      account: undefined as undefined
     })
   }
   return _publicClient

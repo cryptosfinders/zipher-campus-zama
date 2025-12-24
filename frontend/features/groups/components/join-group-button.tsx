@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { toast } from 'sonner'
 import { Address } from 'viem'
+import type { PublicClient } from "viem"
 
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +23,7 @@ import {
 } from '@/lib/config'
 
 import { ADDRESSES } from '@/lib/onchain/contracts'
-import { publicClient } from '@/lib/onchain/network'
+import { publicClient as getPublicClient } from '@/lib/onchain/network'
 
 import { MembershipPassService } from '@/lib/onchain/services/membershipPassService'
 import { MarketplaceService } from '@/lib/onchain/services/marketplaceService'
@@ -58,8 +59,9 @@ type JoinPreparation = {
 export function JoinGroupButton() {
   const { group, owner, isOwner, isMember, membership } = useGroupContext()
   const { address, walletClient, chainId } = useWallet()
-  const pc = publicClient()
-  // Determine which network to use
+  const client = getPublicClient()
+  const publicClient = client as unknown as PublicClient
+// Determine which network to use
   
 
   const joinGroup = useMutation(api.groups.join)
@@ -150,7 +152,7 @@ if (
 
     // Balance check
     if (requiresPayment && !skipPayment) {
-      const nativeBalance = await pc.getBalance({
+      const nativeBalance = await publicClient.getBalance({
         address: blockchainAddress as Address
       }) as bigint
 

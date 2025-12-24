@@ -43,6 +43,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import type { PublicClient } from 'viem'
 
 import { api } from '@/convex/_generated/api'
 import {
@@ -224,7 +225,7 @@ export default function Create() {
 
   const performCreation = useCallback(
     async (values: CreateGroupFormValues, feeQuote: PlatformFeeQuote) => {
-      const client = publicClient()
+      const client = publicClient() as unknown as PublicClient
       let txHash: `0x${string}` | null = null
 
       // Ensure wallet connected

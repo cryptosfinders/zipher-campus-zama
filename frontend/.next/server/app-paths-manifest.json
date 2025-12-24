@@ -1,3 +1,20 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/debug/page": "app/debug/page.js",
+  "/debug/encrypted/page": "app/debug/encrypted/page.js",
+  "/groups/page": "app/groups/page.js",
+  "/memberships/page": "app/memberships/page.js",
+  "/page": "app/page.js",
+  "/debug/encrypted-campus/page": "app/debug/encrypted-campus/page.js",
+  "/(public)/create/page": "app/(public)/create/page.js",
+  "/(public)/marketplace/page": "app/(public)/marketplace/page.js",
+  "/[groupId]/classroom/[courseId]/edit/page": "app/[groupId]/classroom/[courseId]/edit/page.js",
+  "/[groupId]/classroom/[courseId]/page": "app/[groupId]/classroom/[courseId]/page.js",
+  "/[groupId]/classroom/page": "app/[groupId]/classroom/page.js",
+  "/[groupId]/feed/page": "app/[groupId]/feed/page.js",
+  "/[groupId]/members/page": "app/[groupId]/members/page.js",
+  "/[groupId]/page": "app/[groupId]/page.js",
+  "/[groupId]/about/page": "app/[groupId]/about/page.js",
+  "/[groupId]/edit/page": "app/[groupId]/edit/page.js"
 }

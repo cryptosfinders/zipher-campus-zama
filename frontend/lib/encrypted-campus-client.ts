@@ -2,9 +2,9 @@
 
 import {
   type WalletClient,
-  type PublicClient,
   keccak256,
   toBytes,
+  type PublicClient,
   type Hex,
 } from "viem"
 
@@ -37,12 +37,16 @@ const CAMPUS_ADDRESS = ensureAddress(
 )
 
 export class EncryptedCampusClient {
-  private pc: PublicClient
-  private wc: WalletClient | null
+  private pc: ReturnType<typeof getPublicClient>
+  private wc: ReturnType<typeof getWalletClient>
 
   constructor() {
     this.pc = getPublicClient()
     this.wc = getWalletClient()
+  }
+
+private getPC(): PublicClient {
+    return this.pc as unknown as PublicClient
   }
 
   private assertWallet() {
@@ -103,13 +107,14 @@ export class EncryptedCampusClient {
   }): Promise<Hex> {
     const { groupLabel, user } = opts
 
-    const handle = (await this.pc.readContract({
-      address: CAMPUS_ADDRESS,
-      abi: encryptedCampusAbi,
-      functionName: "getMembershipHandle",
-      args: [this.groupId(groupLabel), user],
-    } as any)) as Hex
+    const publicClient = this.pc as unknown as PublicClient
 
+    const handle = (await publicClient.readContract({
+    address: CAMPUS_ADDRESS,
+    abi: encryptedCampusAbi,
+    functionName: "getMembershipHandle",
+    args: [this.groupId(groupLabel), user],
+   } as any)) as Hex
     return handle
   }
 
@@ -161,7 +166,7 @@ export class EncryptedCampusClient {
   }): Promise<Hex> {
     const { groupLabel, user } = opts
 
-    const handle = (await this.pc.readContract({
+    const handle = (await this.getPC().readContract({
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "getReputationHandle",
@@ -234,7 +239,7 @@ export class EncryptedCampusClient {
   }): Promise<Hex> {
     const { pollLabel, option } = opts
 
-    const handle = (await this.pc.readContract({
+    const handle = (await this.getPC().readContract({
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "getTallyHandle",
@@ -269,7 +274,7 @@ export class EncryptedCampusClient {
   async getMetricHandle(opts: { metricLabel: string }): Promise<Hex> {
     const { metricLabel } = opts
 
-    const handle = (await this.pc.readContract({
+    const handle = (await this.getPC().readContract({
       address: CAMPUS_ADDRESS,
       abi: encryptedCampusAbi,
       functionName: "getMetricHandle",

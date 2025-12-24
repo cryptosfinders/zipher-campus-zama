@@ -16,8 +16,9 @@ export const store = mutation({
     const payload = {
       walletAddress,
       displayName: args.displayName ?? existing?.displayName,
-      avatarUrl: args.avatarUrl ?? existing?.avatarUrl
-    }
+      avatarUrl: args.avatarUrl ?? existing?.avatarUrl,
+      createdAt: Date.now(),    
+}
 
     if (existing) {
       await ctx.db.patch(existing._id, payload)
@@ -44,10 +45,12 @@ export const getByAddress = query({
   handler: async (ctx, { address }) => {
     const walletAddress = normalizeAddress(address);
 
-    return await ctx.db
+    const users = await ctx.db
       .query("users")
       .withIndex("by_wallet", (q) => q.eq("walletAddress", walletAddress))
       .unique();
+
+    return users ?? null;
   },
 });
 

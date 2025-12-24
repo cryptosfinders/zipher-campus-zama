@@ -57,6 +57,7 @@ import { parseNativeTokenAmount } from '@/lib/native-token'
 import { formatTimestampRelative } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import { publicClient } from '@/lib/onchain/network'
+import type { PublicClient } from "viem"
 
 const ZIPHER = '#F7C948' // Zipher Campus gold
 
@@ -553,14 +554,14 @@ const platformFeeLabel = useMemo(() => {
     try {
       setIsRegisteringCourse(true)
 
-      const registrarMarketplace = (await (
-  client.readContract as any
-)({
-  address: registrarAddress as `0x${string}`,
-  abi: registrarAbi,
-  functionName: 'marketplace',
-  args: []
-})) as `0x${string}`
+      const publicClient = client as unknown as PublicClient
+      
+     const registrarMarketplace = (await publicClient.readContract({
+	address: registrarAddress as `0x${string}`,
+	abi: registrarAbi,
+	functionName: 'marketplace',
+	args: [],
+} as any)) as `0x${string}`
 
       if (
         !registrarMarketplace ||
@@ -581,7 +582,7 @@ const platformFeeLabel = useMemo(() => {
         priceValue.toString()
       )
 
-      await client.simulateContract({
+      await publicClient.simulateContract({
         address: registrarAddress as `0x${string}`,
         abi: registrarAbi,
         functionName: 'registerCourse',
@@ -594,7 +595,7 @@ const platformFeeLabel = useMemo(() => {
           BigInt(MEMBERSHIP_TRANSFER_COOLDOWN_SECONDS)
         ],
         account: address as `0x${string}`
-      })
+      } as any)
 
     // 1️⃣ Get wallet client (from wherever you already have it)
 const walletClient = (window as any).ethereum
