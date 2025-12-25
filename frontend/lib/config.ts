@@ -12,7 +12,7 @@ export const ZIPHER_CHAIN_ID = Number(
 // FH-EVM RPC (fallback)
 export const ZIPHER_FHEVM_RPC =
   process.env.NEXT_PUBLIC_ZIPHER_FHEVM_RPC ||
-  "https://fhevm.devnet.zama.ai";
+  process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
 
 // Explorer (fallback)
 export const ZIPHER_EXPLORER_URL =
