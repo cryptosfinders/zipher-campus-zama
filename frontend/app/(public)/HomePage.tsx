@@ -340,7 +340,7 @@ export default function HomePage() {
                 <div className='relative aspect-video overflow-hidden rounded-2xl bg-black/80'>
                   <iframe
                     className='absolute inset-0 h-full w-full'
-                    src=''
+                    src='https://youtu.be/R8C8hS8hAu8?si=TP8LKvUzilXFeNal'
                     title='Zipher Campus Zama Demo'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
                     allowFullScreen
