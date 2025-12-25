@@ -47,7 +47,8 @@ import type { PublicClient } from 'viem'
 
 import { api } from '@/convex/_generated/api'
 import {
-  MEMBERSHIP_DURATION_SECONDS,
+ MARKETPLACE_ADDRESS,
+ MEMBERSHIP_DURATION_SECONDS,
   MEMBERSHIP_TRANSFER_COOLDOWN_SECONDS,
   PLATFORM_TREASURY_ADDRESS
 } from '@/lib/config'
@@ -312,7 +313,7 @@ export default function Create() {
 
       const courseIdStr = generateMembershipCourseId()
       const courseId = BigInt(courseIdStr)
-
+      const registrarMarketplace = MARKETPLACE_ADDRESS
       // 🟩 We'll also derive a group label used for encryptedCampus
       const groupLabel = `space-${courseIdStr}`
 
@@ -320,28 +321,35 @@ export default function Create() {
 
       let registrarMarketplace: `0x${string}` | null = null
 
-try {
-  const marketplace = await client.readContract({
-    address: registrarAddress,
-    abi: registrarAbi,
-    functionName: 'marketplace',
-  } as any)
 
-  registrarMarketplace = marketplace as `0x${string}`
-} catch (err) {
-  console.error('Failed to read registrar.marketplace', err)
+if (!registrarMarketplace) {
+  toast.error('Marketplace address missing from environment')
+  return
 }
 
-      if (
-        !registrarMarketplace ||
-        registrarMarketplace ===
-          '0x0000000000000000000000000000000000000000'
-      ) {
-        toast.error(
-          'Registrar is not configured with a marketplace. Contact admin.'
-        )
-        return
-      }
+
+//try {
+  // const marketplace = await client.readContract({
+  //  address: registrarAddress,
+  //  abi: registrarAbi,
+  //  functionName: 'marketplace',
+ // } as any)
+
+ // registrarMarketplace = marketplace as `0x${string}`
+//} catch (err) {
+//  console.error('Failed to read registrar.marketplace', err)
+//}
+
+  //    if (
+   //     !registrarMarketplace ||
+     //   registrarMarketplace ===
+       //   '0x0000000000000000000000000000000000000000'
+     // ) {
+      //  toast.error(
+       //   'Registrar is not configured with a marketplace. Contact admin.'
+       // )
+       // return
+     // }
 
       /* ----------------- Simulation for registerCourse --------------------- */
 

@@ -61,3 +61,15 @@ export const PLATFORM_TREASURY_ADDRESS =
 export const REVENUE_SPLIT_ROUTER =
   (process.env.NEXT_PUBLIC_REVENUE_SPLIT_ROUTER_ADDRESS as `0x${string}`) ||
   "0x0000000000000000000000000000000000000000";
+
+// ------------------------------
+// Core contracts (PRODUCTION)
+// ------------------------------
+export const REGISTRAR_ADDRESS =
+  process.env.NEXT_PUBLIC_REGISTRAR_CONTRACT_ADDRESS as `0x${string}`
+
+export const MARKETPLACE_ADDRESS =
+  process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS as `0x${string}`
+
+export const MEMBERSHIP_CONTRACT_ADDRESS =
+  process.env.NEXT_PUBLIC_MEMBERSHIP_CONTRACT_ADDRESS as `0x${string}`
