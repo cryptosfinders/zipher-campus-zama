@@ -21,25 +21,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(public)/layout.js"
     ],
-    "/(public)/marketplace/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(public)/marketplace/page.js"
-    ],
-    "/memberships/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/memberships/page.js"
-    ],
-    "/groups/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/groups/page.js"
-    ],
     "/(public)/create/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(public)/create/page.js"
+    ],
+    "/[groupId]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[groupId]/layout.js"
+    ],
+    "/[groupId]/about/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[groupId]/about/page.js"
     ]
   }
 }

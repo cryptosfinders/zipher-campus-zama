@@ -1,7 +1,5 @@
 {
   "/page": "app/page.js",
-  "/memberships/page": "app/memberships/page.js",
-  "/groups/page": "app/groups/page.js",
-  "/(public)/marketplace/page": "app/(public)/marketplace/page.js",
+  "/[groupId]/about/page": "app/[groupId]/about/page.js",
   "/(public)/create/page": "app/(public)/create/page.js"
 }
