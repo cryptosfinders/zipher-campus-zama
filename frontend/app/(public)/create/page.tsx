@@ -47,7 +47,7 @@ import type { PublicClient } from 'viem'
 
 import { api } from '@/convex/_generated/api'
 import {
- MARKETPLACE_ADDRESS,
+MARKETPLACE_ADDRESS, 
  MEMBERSHIP_DURATION_SECONDS,
   MEMBERSHIP_TRANSFER_COOLDOWN_SECONDS,
   PLATFORM_TREASURY_ADDRESS
@@ -313,18 +313,20 @@ export default function Create() {
 
       const courseIdStr = generateMembershipCourseId()
       const courseId = BigInt(courseIdStr)
-const registrarMarketplace = MARKETPLACE_ADDRESS
       // 🟩 We'll also derive a group label used for encryptedCampus
       const groupLabel = `space-${courseIdStr}`
 
       /* ------------ Preflight registrar.marketplace on ACTIVE chain -------- */
+const registrarMarketplace = MARKETPLACE_ADDRESS
 
-      let registrarMarketplace: `0x${string}` | null = null
-
-if (!registrarMarketplace) {
-  toast.error('Marketplace address missing from environment')
+      if (
+  !MARKETPLACE_ADDRESS ||
+  MARKETPLACE_ADDRESS === "0x0000000000000000000000000000000000000000"
+) {
+  toast.error("Marketplace not configured")
   return
 }
+
       /* ----------------- Simulation for registerCourse --------------------- */
 
       try {
