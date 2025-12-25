@@ -13,7 +13,7 @@ import { WalletProvider } from '@/lib/web3/WalletProvider'
 import { EthereumAccountProvider } from '@/hooks/use-ethereum-account'
 
 // Wagmi wrapper (client boundary)
-import { WagmiClientWrapper } from '@/providers/wagmi-client-wrapper'
+import { WagmiClientWrapper } from './wagmi-client-wrapper'
 
 type AppProvidersProps = {
   children: ReactNode

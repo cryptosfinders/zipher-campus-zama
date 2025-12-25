@@ -3,7 +3,8 @@ const path = require("node:path");
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-outputFileTracingRoot: __dirname,
+  outputFileTracingRoot: __dirname,
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
@@ -35,14 +36,23 @@ outputFileTracingRoot: __dirname,
     ];
   },
 
-  // ✅ FIX FOR NEXT 15
+  // ✅ Next 15 fix
   serverExternalPackages: ["@farcaster/miniapp-sdk", "convex"],
 
   webpack(config) {
+    // ✅ Node polyfills OFF (MetaMask / wagmi fix)
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      encoding: false,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+
+    // ✅ Aliases (CORRECT LOCATION)
     config.resolve.alias = {
       ...config.resolve.alias,
 
-      // shared aliases
       "@react-native-async-storage/async-storage": path.resolve(
         "./src/lib/async-storage-shim.ts"
       ),
@@ -54,13 +64,12 @@ outputFileTracingRoot: __dirname,
       "@/lib": path.resolve("./lib"),
       "@/components": path.resolve("./components"),
       "@/features": path.resolve("./features"),
-      "@/hooks": path.resolve("/hooks"),
-      "@/providers": path.resolve("/providers"),
+      "@/hooks": path.resolve("./hooks"),
+      "@/providers": path.resolve("./providers"),
+      "@/convex": path.resolve(process.cwd(), "convex"),
 
-      // 🚀 FINAL FIX: absolute convex alias
-      "@/convex": path.resolve(process.cwd(), "@/convex"),
       tslib: require.resolve("tslib"),
-  };
+    };
 
     return config;
   },
