@@ -10,6 +10,8 @@ import { Toaster } from "sonner"
 import { AppNavbar } from "@/components/layout/app-navbar"
 import { AppProviders } from "@/providers/app-providers"
 
+export const dynamic = "force-dynamic";
+
 // ❌ REMOVE: WalletProvider import
 // import { WalletProvider } from "@/lib/web3/WalletProvider";
 
