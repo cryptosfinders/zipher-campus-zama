@@ -9,31 +9,31 @@ const SEPOLIA_RPC =
   process.env.SEPOLIA_RPC_URL ||
   "";
 
-const FHEVM_RPC =
-  process.env.NEXT_PUBLIC_ZIPHER_FHEVM_RPC ||
-  "http://127.0.0.1:8545";
+//const FHEVM_RPC =
+  //process.env.NEXT_PUBLIC_ZIPHER_FHEVM_RPC ||
+  //"http://127.0.0.1:8545";
 
-const FHEVM_CHAIN_ID = Number(
-  process.env.NEXT_PUBLIC_ZIPHER_CHAIN_ID || "31337"
-);
+//const FHEVM_CHAIN_ID = Number(
+  //process.env.NEXT_PUBLIC_ZIPHER_CHAIN_ID || "31337"
+//);
 
 /* -------------------------------
    FHEVM Chain (Zipher FH-EVM)
 -------------------------------- */
-export const fhevmChain = defineChain({
-  id: FHEVM_CHAIN_ID,
-  name: "Zipher FH-EVM",
-  network: "zipher-fhevm",
-  nativeCurrency: {
-    name: "ETH",
-    symbol: "ETH",
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: { http: [FHEVM_RPC] },
-    public: { http: [FHEVM_RPC] },
-  },
-});
+//export const fhevmChain = defineChain({
+ // id: FHEVM_CHAIN_ID,
+ // name: "Zipher FH-EVM",
+ // network: "zipher-fhevm",
+ // nativeCurrency: {
+   // name: "ETH",
+   // symbol: "ETH",
+   // decimals: 18,
+ // },
+ // rpcUrls: {
+   // default: { http: [FHEVM_RPC] },
+   // public: { http: [FHEVM_RPC] },
+  //},
+//});
 
 /* -------------------------------
    Sepolia Public Client
@@ -54,9 +54,9 @@ export function getSepoliaPublicClient() {
 /* -------------------------------
    FHEVM Public Client
 -------------------------------- */
-export function getFhevmPublicClient() {
-  return createPublicClient({
-    chain: fhevmChain,
-    transport: http(FHEVM_RPC),
-  });
-}
+//export function getFhevmPublicClient() {
+ // return createPublicClient({
+   // chain: fhevmChain,
+   // transport: http(FHEVM_RPC),
+ // });
+//}

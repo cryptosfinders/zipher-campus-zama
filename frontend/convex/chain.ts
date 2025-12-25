@@ -18,9 +18,9 @@ export const sepoliaClient = createPublicClient({
   transport: http(SEPOLIA_RPC_URL),
 });
 
-export const fhevmClient = createPublicClient({
-  transport: http(ZIPHER_FHEVM_RPC_URL),
-});
+//export const fhevmClient = createPublicClient({
+//  transport: http(ZIPHER_FHEVM_RPC_URL),
+//});
 
 // ------------------------------------------------------------
 // ACTION: Register a course on-chain
