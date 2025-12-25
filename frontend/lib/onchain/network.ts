@@ -33,8 +33,8 @@ import {
  */
 const NETWORK = process.env.NEXT_PUBLIC_NETWORK?.toLowerCase() ?? 'sepolia'
 
-const IS_FHE = NETWORK === 'fhevm'
-
+//const IS_FHE = NETWORK === 'fhevm'
+ export const IS_FHE = false
 /* -------------------------------------------------------------------------- */
 /*                               RPC ENDPOINTS                                 */
 /* -------------------------------------------------------------------------- */
@@ -43,31 +43,31 @@ const SEPOLIA_RPC_URL =
   process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL ??
   'https://eth-sepolia.g.alchemy.com/v2/demo'
 
-const FHE_RPC_URL = ZIPHER_FHEVM_RPC ?? 'http://127.0.0.1:8545'
+//const FHE_RPC_URL = ZIPHER_FHEVM_RPC ?? 'http://127.0.0.1:8545'
 
 /* -------------------------------------------------------------------------- */
 /*                               CHAIN OBJECTS                                 */
 /* -------------------------------------------------------------------------- */
 
-const fhevmChain: Chain = {
-  id: ZIPHER_CHAIN_ID || 31337,
-  name: 'Zipher FH-EVM',
-  nativeCurrency: {
-    name: NATIVE_TOKEN_SYMBOL || 'FHE',
-    symbol: NATIVE_TOKEN_SYMBOL || 'FHE',
-    decimals: 18
-  },
-  rpcUrls: {
-    default: { http: [FHE_RPC_URL] },
-    public: { http: [FHE_RPC_URL] }
-  },
-  blockExplorers: {
-    default: {
-      name: 'FH Explorer',
-      url: ZIPHER_EXPLORER_URL || 'http://localhost:8545'
-    }
-  }
-}
+//const fhevmChain: Chain = {
+  //id: ZIPHER_CHAIN_ID || 31337,
+ // name: 'Zipher FH-EVM',
+ // nativeCurrency: {
+   // name: NATIVE_TOKEN_SYMBOL || 'FHE',
+   // symbol: NATIVE_TOKEN_SYMBOL || 'FHE',
+   // decimals: 18
+ // },
+ // rpcUrls: {
+   // default: { http: [FHE_RPC_URL] },
+   // public: { http: [FHE_RPC_URL] }
+ // },
+ // blockExplorers: {
+   // default: {
+     // name: 'FH Explorer',
+      //url: ZIPHER_EXPLORER_URL || 'http://localhost:8545'
+   // }
+ // }
+//}
 
 const sepoliaChain: Chain = {
   ...sepolia,
@@ -89,7 +89,8 @@ const sepoliaChain: Chain = {
 /*                         ACTIVE CHAIN RESOLUTION                             */
 /* -------------------------------------------------------------------------- */
 
-const ACTIVE_CHAIN: Chain = IS_FHE ? fhevmChain : sepoliaChain
+//const ACTIVE_CHAIN: Chain = IS_FHE ? fhevmChain : sepoliaChain
+const ACTIVE_CHAIN: Chain = sepoliaChain
 
 export const ACTIVE_CHAIN_ID = ACTIVE_CHAIN.id
 export const ACTIVE_CHAIN_ID_HEX = `0x${ACTIVE_CHAIN.id.toString(16)}`
@@ -140,4 +141,5 @@ export function walletClient(): WalletClient | null {
 /*                     EXTRA EXPORTS FOR WAGMI V2 CONFIG                       */
 /* -------------------------------------------------------------------------- */
 
-export { fhevmChain, sepoliaChain, ACTIVE_CHAIN }
+//export { fhevmChain, sepoliaChain, ACTIVE_CHAIN }
+export { sepoliaChain, ACTIVE_CHAIN }

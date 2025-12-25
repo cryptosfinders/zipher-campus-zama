@@ -5,7 +5,7 @@ import { createPublicClient, encodeFunctionData, http } from "viem";
 
 import {
   SEPOLIA_RPC_URL,
-  ZIPHER_FHEVM_RPC_URL,
+// ZIPHER_FHEVM_RPC_URL,
   REGISTRAR_CONTRACT_ADDRESS,
 } from "./config";
 
