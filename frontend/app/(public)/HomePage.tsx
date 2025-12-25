@@ -340,7 +340,7 @@ export default function HomePage() {
                 <div className='relative aspect-video overflow-hidden rounded-2xl bg-black/80'>
                   <iframe
                     className='absolute inset-0 h-full w-full'
-                    src='https://youtu.be/R8C8hS8hAu8?si=TP8LKvUzilXFeNal'
+                    src=' https://youtu.be/R8C8hS8hAu8?si=TP8LKvUzilXFeNal '
                     title='Zipher Campus Zama Demo'
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
                     allowFullScreen
@@ -550,7 +550,7 @@ export default function HomePage() {
               </div>
 
               <div className='flex flex-wrap justify-center gap-6 text-sm text-muted-foreground'>
-                <div className='flex items-center gap-2'>
+                <div classWName='flex items-center gap-2'>
                   <CheckCircle2 className='h-4 w-4 text-[#F5B700]' />
                   <span>No plaintext storage</span>
                 </div>
